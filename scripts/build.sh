@@ -56,6 +56,10 @@ function buildDockerImages {
     touch pgadmin/pgadmin.json
     envsubst < pgadmin/config_local > pgadmin/config_local.py
 
+    #### Jupyter Dockerfile update
+    touch jupyter/Dockerfile
+    envsubst < jupyter/Dockerfile.org > jupyter/Dockerfile
+
 
     docker build ./postgres/ -t localhost:$registry_port/data-lake-postgres
     docker build ./keycloak/ -t localhost:$registry_port/data-lake-keycloak
@@ -66,7 +70,7 @@ function buildDockerImages {
     rm postgres/preloaded_data/01-keycloak.sql
     rm keycloak/clients/pgadmin.json   # Key-cloak Auth configured json
     rm pgadmin/config_local.py         # Key-cloak Auth configured py
-
+    rm jupyter/Dockerfile              # Jupyter dockerfile with client key
 
     ### Push the docker-image to the local registry
     printf "\nPush the docker-image to the registry\n"
@@ -101,7 +105,7 @@ function buildKubernetes {
 
     ### Setup the Keycloak pod / service
     horizontal_seperator "Setup Jupyter Pod"
-    envsubst < jupyter/jupyter-w-local.yaml | $kubectl apply -f -
+    envsubst < jupyter/jupyter.yaml | $kubectl apply -f -
 
 
     ### ============== Show all of our relavent pods / services ==============
