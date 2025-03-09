@@ -1,3 +1,0 @@
-[submodule "dis/open-dis-python"]
-	path = dis/open-dis-python
-	url = git@github.com:open-dis/open-dis-python.git
