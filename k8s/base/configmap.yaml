@@ -1,0 +1,10 @@
+piVersion: v1
+kind: ConfigMap
+metadata:
+  name: stone-data-lake-configmap
+  namespace: stone-data-lake
+  labels:
+    app: postgres
+data:
+  postgres-dbname: pg-data-lake
+  postgres-db-location: ${postgres_local_path}

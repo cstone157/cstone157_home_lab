@@ -1,0 +1,12 @@
+resources:
+  - base/namespace.yaml
+  - base/secret.yaml
+  - base/configmap.yaml
+## Postgres
+  - base/postgres/deployment.yaml
+  - base/postgres/svc.yaml
+  - base/postgres/local/pv.yaml
+  - base/postgres/local/pvc.yaml
+## PgAdmin
+  - base/pgadmin/deployment.yaml
+  - base/pgadmin/svc.yaml
