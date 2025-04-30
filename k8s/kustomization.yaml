@@ -2,6 +2,7 @@ resources:
   - base/namespace.yaml
   - base/secret.yaml
   - base/configmap.yaml
+  
 ## Postgres
   - base/postgres/deployment.yaml
   - base/postgres/svc.yaml
@@ -10,3 +11,23 @@ resources:
 ## PgAdmin
   - base/pgadmin/deployment.yaml
   - base/pgadmin/svc.yaml
+
+## JupyterLab
+  - base/jupyter/deployment.yaml
+  - base/jupyter/svc.yaml
+  - base/jupyter/local/pv.yaml
+  - base/jupyter/local/pvc.yaml
+
+## Keycloak
+  - base/keycloak/deployment.yaml
+  - base/keycloak/svc.yaml
+  - base/keycloak/secrets.yaml
+
+## Mongo
+  - base/mongo/deployment.yaml
+  - base/mongo/svc.yaml
+  - base/mongo/secrets.yaml
+## MongoExpress
+  - base/mongo-express/deployment.yaml
+  - base/mongo-express/svc.yaml
+  - base/mongo-express/configmap.yaml
