@@ -32,20 +32,20 @@ _command="$1"
 if [ "$_command" == "cleanup" ]; then
     source ./scripts/cleanup.sh
     cleanupCommand $2
-## ============== EXECUTE BUILD COMMAND BLOCK =============
-elif [ "$_command" == "build" ]; then
-    source ./scripts/build.sh
-    buildCommand $2
-## ============= EXECUTE STATUS COMMAND BLOCK =============
-elif [ "$_command" == "status" ]; then
-    get_status
-## ================ OPEN PODS COMMAND LINE ================
-elif [ "$_command" == "exec" ]; then
-    $kubectl exec -it -n stone-data-lake pod/keycloak-d67848c6-xkvm9 -- sh
-## ============= TEMP REGISTRY COMMAND BLOCK =============
-elif [ "$_command" == "registry" ]; then
-    source ./scripts/build.sh
-    buildRegistry
+# ## ============== EXECUTE BUILD COMMAND BLOCK =============
+# elif [ "$_command" == "build" ]; then
+#     source ./scripts/build.sh
+#     buildCommand $2
+# ## ============= EXECUTE STATUS COMMAND BLOCK =============
+# elif [ "$_command" == "status" ]; then
+#     get_status
+# ## ================ OPEN PODS COMMAND LINE ================
+# elif [ "$_command" == "exec" ]; then
+#     $kubectl exec -it -n stone-data-lake pod/keycloak-d67848c6-xkvm9 -- sh
+# ## ============= TEMP REGISTRY COMMAND BLOCK =============
+# elif [ "$_command" == "registry" ]; then
+#     source ./scripts/build.sh
+#     buildRegistry
 
 else
     printf "Unknown command\n\tOnly recognized commands:\n\t\tcleanup - \n\t\tbuild - \n\t\tstatus - \n\t\texec - Don't use exec, it won't work\n\t\tregistry - \n"
