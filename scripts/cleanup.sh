@@ -33,7 +33,8 @@ function cleanupCommand {
         # V2
         # $kubectl delete namespace stone-data-lake && $kubectl delete pvc --all && $kubectl delete pv --all && $kubectl delete secrets --all && $kubectl delete configmap --all
 
-        $kubectl delete -f k8s/kustomization.yaml
+        #$kubectl delete -f k8s/kustomization.yaml
+        #$kubectl kustomize k8s/
     fi
 
     # ## If any of our parameters are docker, then go ahead and cleanup our docker enviroment

@@ -1,7 +1,7 @@
 resources:
   - base/namespace.yaml
-  # - base/secret.yaml
-  # - base/configmap.yaml
+  - base/secret.yaml
+  - base/configmap.yaml
 
 # ## Postgres
 #   - base/postgres/deployment.yaml
