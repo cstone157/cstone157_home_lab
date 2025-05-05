@@ -32,10 +32,11 @@ _command="$1"
 if [ "$_command" == "cleanup" ]; then
     source ./scripts/cleanup.sh
     cleanupCommand $2
-# ## ============== EXECUTE BUILD COMMAND BLOCK =============
-# elif [ "$_command" == "build" ]; then
-#     source ./scripts/build.sh
-#     buildCommand $2
+## ============== EXECUTE BUILD COMMAND BLOCK =============
+elif [ "$_command" == "build" ]; then
+    kubectl kustomize k8s
+    # source ./scripts/build.sh
+    # buildCommand $2
 # ## ============= EXECUTE STATUS COMMAND BLOCK =============
 # elif [ "$_command" == "status" ]; then
 #     get_status
