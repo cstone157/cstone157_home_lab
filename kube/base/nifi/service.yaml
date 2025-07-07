@@ -1,0 +1,29 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: nifi-service
+spec:
+  ports:
+  - port: 8180
+    targetPort: 8080
+    name: http-port
+  - port: 8443
+    name: https-port
+  selector:
+    app: nifi
+  type: LoadBalancer 
+
+# apiVersion: v1
+# kind: Service
+# metadata:
+#   name: nifi-service
+# spec:
+#   selector:
+#     app: nifi
+#   ports:
+#   - protocol: TCP
+#     port: 11434
+#     targetPort: 11434
+#   - protocol: UDP
+#     port: 11434
+#     targetPort: 11434

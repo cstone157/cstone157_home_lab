@@ -1,0 +1,54 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nifi
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: nifi
+  template:
+    metadata:
+      labels:
+        app: nifi
+    spec: 
+      containers:
+      - name: nifi-container
+        image: "apache/nifi:1.10.0"
+        imagePullPolicy: Always
+        volumeMounts:
+        - name: nifi-logs-pv
+          mountPath: /opt/nifi/nifi-current/logs
+        - name: nifi-content-pv
+          mountPath: /opt/nifi/nifi-current/content-repository
+        - name: nifi-flowfile-pv
+          mountPath: /opt/nifi/nifi-current/flowfile-repository
+        - name: nifi-db-pv
+          mountPath: /opt/nifi/nifi-current/database-repository
+        - name: nifi-provenance-pv
+          mountPath: /opt/nifi/nifi-current/provenance-repository
+        ports:
+        - containerPort: 8080
+          name: http-port
+        - containerPort: 8443
+          name: https-port   
+        env:
+        - name: VERSION
+          value: "1.10"
+      volumes:
+      - name: nifi-logs-pv
+        persistentVolumeClaim: 
+          claimName: nifi-logs-pvc
+      - name: nifi-content-pv
+        persistentVolumeClaim: 
+          claimName: nifi-content-pvc
+      - name: nifi-flowfile-pv
+        persistentVolumeClaim: 
+          claimName: nifi-flowfile-pvc
+      - name: nifi-db-pv
+        persistentVolumeClaim: 
+          claimName: nifi-db-pvc
+      - name: nifi-provenance-pv
+        persistentVolumeClaim: 
+          claimName: nifi-provenance-pvc

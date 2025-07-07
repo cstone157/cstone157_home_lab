@@ -18,8 +18,8 @@ spec:
         image: ollama/ollama:latest
         ports:
         - containerPort: 11434
-        protocol: TCP
-        # resources:
+          protocol: TCP
+        # resources: # Commendted out, everytime this resource setup is deployed on a rancher desktop it will crash
         #   requests:
         #     cpu: "2000m"
         #     memory: "2Gi"

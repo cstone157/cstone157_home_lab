@@ -1,0 +1,13 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: nifi-ingress
+spec:
+  rules:
+  - host: nifi
+    http:
+      paths:
+      - path: /nifi
+        backend:
+          serviceName: nifi-service
+          servicePort: 8180
