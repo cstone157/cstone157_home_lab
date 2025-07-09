@@ -1,4 +1,5 @@
-apiVersion: extensions/v1beta1
+#apiVersion: extensions/v1beta1
+apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: nifi-ingress
@@ -8,6 +9,9 @@ spec:
     http:
       paths:
       - path: /nifi
+        pathType: Prefix
         backend:
-          serviceName: nifi-service
-          servicePort: 8180
+          service:
+            name: nifi-service
+            port:
+              number: 8180

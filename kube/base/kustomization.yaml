@@ -24,5 +24,5 @@ resources:
   - ./nifi/pvc.yaml
   - ./nifi/deployment.yaml
   - ./nifi/service.yaml
-  - ./nifi/ingress.yaml
+  #- ./nifi/ingress.yaml
   

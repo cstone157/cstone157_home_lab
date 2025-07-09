@@ -4,11 +4,36 @@ metadata:
   name: nifi-service
 spec:
   ports:
-  - port: 8180
-    targetPort: 8080
+  - port: 8080
     name: http-port
+    nodePort: 31000
   - port: 8443
     name: https-port
+    nodePort: 31001
+  - port: 9001
+    name: tcp-port1
+    nodePort: 9001
+  - port: 9002
+    name: tcp-port2
+    nodePort: 9002
+  - port: 9003
+    name: tcp-port3
+    nodePort: 9003
+  - port: 9004
+    name: tcp-port4
+    nodePort: 9004
+  - port: 9011
+    name: udp-port1
+    nodePort: 9011
+  - port: 9012
+    name: udp-port2
+    nodePort: 9012
+  - port: 9013
+    name: udp-port3
+    nodePort: 9013
+  - port: 9014
+    name: udp-port4
+    nodePort: 9014
   selector:
     app: nifi
   type: LoadBalancer 

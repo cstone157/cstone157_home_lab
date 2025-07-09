@@ -1,3 +1,4 @@
+# https://hub.docker.com/r/apache/nifi
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -15,27 +16,57 @@ spec:
     spec: 
       containers:
       - name: nifi-container
-        image: "apache/nifi:1.10.0"
+        image: "apache/nifi:2.4.0"
         imagePullPolicy: Always
+        resources: 
+          requests:
+            cpu: "2000m"
+            memory: "2Gi"
+          limits:
+            cpu: "4000m"
+            memory: "4Gi"
+            nvidia.com/gpu: "0"
         volumeMounts:
         - name: nifi-logs-pv
           mountPath: /opt/nifi/nifi-current/logs
         - name: nifi-content-pv
           mountPath: /opt/nifi/nifi-current/content-repository
-        - name: nifi-flowfile-pv
-          mountPath: /opt/nifi/nifi-current/flowfile-repository
-        - name: nifi-db-pv
-          mountPath: /opt/nifi/nifi-current/database-repository
-        - name: nifi-provenance-pv
-          mountPath: /opt/nifi/nifi-current/provenance-repository
+      #   - name: nifi-flowfile-pv
+      #     mountPath: /opt/nifi/nifi-current/flowfile-repository
+      #   - name: nifi-db-pv
+      #     mountPath: /opt/nifi/nifi-current/database-repository
+      #   - name: nifi-provenance-pv
+      #     mountPath: /opt/nifi/nifi-current/provenance-repository
         ports:
         - containerPort: 8080
           name: http-port
         - containerPort: 8443
-          name: https-port   
+          name: https-port
+        - containerPort: 9001
+          name: tcp-port1
+        - containerPort: 9002
+          name: tcp-port2
+        - containerPort: 9003
+          name: tcp-port3
+        - containerPort: 9004
+          name: tcp-port4
+        - containerPort: 9011
+          name: udp-port1
+        - containerPort: 9012
+          name: udp-port2
+        - containerPort: 9013
+          name: udp-port3
+        - containerPort: 9014
+          name: udp-port4
         env:
-        - name: VERSION
-          value: "1.10"
+        - name: NIFI_WEB_HTTPS_HOST
+          value: "0.0.0.0"
+        - name: SINGLE_USER_CREDENTIALS_USERNAME
+          value: "admin"
+        - name: SINGLE_USER_CREDENTIALS_PASSWORD
+          value: "admin"
+      #   - name: VERSION
+      #     value: "1.10"
       volumes:
       - name: nifi-logs-pv
         persistentVolumeClaim: 
@@ -43,12 +74,12 @@ spec:
       - name: nifi-content-pv
         persistentVolumeClaim: 
           claimName: nifi-content-pvc
-      - name: nifi-flowfile-pv
-        persistentVolumeClaim: 
-          claimName: nifi-flowfile-pvc
-      - name: nifi-db-pv
-        persistentVolumeClaim: 
-          claimName: nifi-db-pvc
-      - name: nifi-provenance-pv
-        persistentVolumeClaim: 
-          claimName: nifi-provenance-pvc
+      # - name: nifi-flowfile-pv
+      #   persistentVolumeClaim: 
+      #     claimName: nifi-flowfile-pvc
+      # - name: nifi-db-pv
+      #   persistentVolumeClaim: 
+      #     claimName: nifi-db-pvc
+      # - name: nifi-provenance-pv
+      #   persistentVolumeClaim: 
+      #     claimName: nifi-provenance-pvc
