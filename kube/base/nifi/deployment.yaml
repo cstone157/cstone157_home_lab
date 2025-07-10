@@ -38,25 +38,25 @@ spec:
       #   - name: nifi-provenance-pv
       #     mountPath: /opt/nifi/nifi-current/provenance-repository
         ports:
-        - containerPort: 8080
+        - containerPort: 31000
           name: http-port
-        - containerPort: 8443
+        - containerPort: 31001
           name: https-port
-        - containerPort: 9001
+        - containerPort: 31011
           name: tcp-port1
-        - containerPort: 9002
+        - containerPort: 31012
           name: tcp-port2
-        - containerPort: 9003
+        - containerPort: 31013
           name: tcp-port3
-        - containerPort: 9004
+        - containerPort: 31014
           name: tcp-port4
-        - containerPort: 9011
+        - containerPort: 31021
           name: udp-port1
-        - containerPort: 9012
+        - containerPort: 31022
           name: udp-port2
-        - containerPort: 9013
+        - containerPort: 31023
           name: udp-port3
-        - containerPort: 9014
+        - containerPort: 31024
           name: udp-port4
         env:
         - name: NIFI_WEB_HTTPS_HOST
@@ -65,6 +65,10 @@ spec:
           value: "admin"
         - name: SINGLE_USER_CREDENTIALS_PASSWORD
           value: "admin"
+        - name: NIFI_WEB_HTTPS_PORT
+          value: "31001"
+        - name: NIFI_WEB_HTTP_PORT
+          value: "31001"
       #   - name: VERSION
       #     value: "1.10"
       volumes:

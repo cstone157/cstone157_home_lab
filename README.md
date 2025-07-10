@@ -19,7 +19,16 @@
     - URLs
         - WebUI : http://localhost:30000
         - PgAdmin : http://localhost:30010
-        - Nifi : 
+        - Nifi : http://localhost:31000
+            - https : http://localhost:31001
+            - tcp port 1 : localhost:31011
+            - tcp port 2 : localhost:31012
+            - tcp port 3 : localhost:31013
+            - tcp port 4 : localhost:31014
+            - udp port 1 : localhost:31021
+            - udp port 2 : localhost:31022
+            - udp port 3 : localhost:31023
+            - udp port 4 : localhost:31024
 
 
 ## Setup
