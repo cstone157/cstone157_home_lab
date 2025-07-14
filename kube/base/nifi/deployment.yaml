@@ -64,11 +64,11 @@ spec:
         - name: SINGLE_USER_CREDENTIALS_USERNAME
           value: "admin"
         - name: SINGLE_USER_CREDENTIALS_PASSWORD
-          value: "admin"
+          value: "password123456789" # Password must be a minimum of 12 characters, or system will generate a new one.
         - name: NIFI_WEB_HTTPS_PORT
           value: "31001"
         - name: NIFI_WEB_HTTP_PORT
-          value: "31001"
+          value: "31000"
       #   - name: VERSION
       #     value: "1.10"
       volumes:

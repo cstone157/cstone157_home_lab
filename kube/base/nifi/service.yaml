@@ -8,11 +8,13 @@ spec:
   type: NodePort  # Use LoadBalancer if you're on a cloud that supports it
   ports:
   - protocol: TCP
-    port: 8080
+    #port: 8080
+    port: 31000
     name: http-port
     nodePort: 31000
   - protocol: TCP
-    port: 8443
+    #port: 8443
+    port: 31001
     name: https-port
     nodePort: 31001
   - protocol: TCP

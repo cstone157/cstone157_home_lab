@@ -18,6 +18,7 @@
 
     - URLs
         - WebUI : http://localhost:30000
+            - Add a connection under Admin/Settings for : http://ollama-service:11434
         - PgAdmin : http://localhost:30010
         - Nifi : http://localhost:31000
             - https : http://localhost:31001
@@ -35,15 +36,21 @@
 
 ### Steps to setup (v1) - DELTE ME (https://sarinsuriyakoon.medium.com/deploy-ollama-on-local-kubernetes-microk8s-6ca22bfb7fa3)
 
-    - Install deployment and the service
-    - Remote into the application and install a model
-
-<code>$ ollama pull llama2</code>
-
+    - Apply kustomization : 
+<code>$ kubectl apply -k ./kube/vi/ </code>
+    - Remote into the ollama pod and install a model
+<code>
+$ kubectl exec -it -n=lab-test ollama-0 -- sh
+# ollama pull llama2
+</code>
     - Test to ensure that the model successfully installed
-
 <code>$ curl localhost:11434 -d '{ "model": "llama2", "prompt":"Why is the sky blue?" }'</code>
 
+### Build images
+
+#### Rancher Desktop
+
+    - Use "nerdctl build" to build image and the "images to upload you image"
 
 ## Sources
 
