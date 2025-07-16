@@ -26,3 +26,8 @@ resources:
   - ./nifi/service.yaml
   #- ./nifi/ingress.yaml
   
+  # JupyterLab Deployment
+  - ./jupyter/deployment.yaml
+  - ./jupyter/service.yaml
+  
+  

@@ -17,6 +17,7 @@
 ### Accessing applications
 
     - URLs
+        - JupyterLab : http://localhost:30020
         - WebUI : http://localhost:30000
             - Add a connection under Admin/Settings for : http://ollama-service:11434
         - PgAdmin : http://localhost:30010
@@ -39,12 +40,10 @@
     - Apply kustomization : 
 <code>$ kubectl apply -k ./kube/vi/ </code>
     - Remote into the ollama pod and install a model
-<code>
-$ kubectl exec -it -n=lab-test ollama-0 -- sh
-# ollama pull llama2
-</code>
+<code>$ kubectl exec -it -n=lab-test ollama-0 -- sh</code><br><code># ollama pull llama2</code>
     - Test to ensure that the model successfully installed
-<code>$ curl localhost:11434 -d '{ "model": "llama2", "prompt":"Why is the sky blue?" }'</code>
+<code># ollama run llama2 "Why is the sky blue?" </code><br />
+<code># curl localhost:11434 -d '{ "model": "llama2", "prompt":"Why is the sky blue?" }'</code>
 
 ### Build images
 
