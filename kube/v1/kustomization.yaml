@@ -5,5 +5,5 @@ namespace: lab-test
 
 resources:
 - namespace.yaml
-- ..\base\
+- ../base/
 
