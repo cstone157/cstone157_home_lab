@@ -1,4 +1,3 @@
-
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
@@ -22,37 +21,40 @@ spec:
             - containerPort: 8888
               name: jupyter-http
               protocol: TCP
-          securityContext:
-            runAsUser: 1000
-            runAsGroup: 100
-          resources:
-            requests: 
-              cpu: "2000m"
-              memory: "2Gi"
-            limits:
-              cpu: "4000m"
-              memory: "4Gi"
-          image: jupyter/minimal-notebook:x86_64-python-3.11.6
-          command: ["start-notebook.sh"]
-          args: ["--LabApp.token='password'", "--LabApp.ip='0.0.0.0'", "--LabApp.allow_root=True"]
+#           securityContext:
+#             runAsUser: 1000
+#             runAsGroup: 100
+#           resources:
+#             requests: 
+#               cpu: "2000m"
+#               memory: "2Gi"
+#             limits:
+#               cpu: "4000m"
+#               memory: "4Gi"
+#           image: jupyter/minimal-notebook:x86_64-python-3.11.6
+#           image: jupyter/datascience-notebook:x86_64-ubuntu-22.04
+          image: jupyter/minimal-notebook:notebook-7.0.6
 #           command: ["start-notebook.sh"]
+#           args: ["--NotebookApp.token=''"]
+#           args: ["--LabApp.token='password'", "--LabApp.ip='0.0.0.0'", "--LabApp.allow_root=True"]
 #           command: 
 #             - /bin/bash
 #               -c
 #               - |
 #                 start-notebook.sh jupyter lab --LabApp.token='password' --LabApp.ip='0.0.0.0' --LabApp.allow_root=True
 #                 start.sh jupyter lab --LabApp.token='password' --LabApp.ip='0.0.0.0' --LabApp.allow_root=True --ServerApp.base_url='/jupyter/'
-          volumeMounts:
-          - mountPath: "/home/jovyan/work"
-            name: local-storage
-  volumeClaimTemplates:
-  - metadata:
-      name: local-storage
-    spec:
-      accessModes: [ "ReadWriteOnce" ]
-      resources:
-        requests:
-          storage: 10Gi
+#           command: ["start-notebook.sh", "work", "lab", "--LabApp.ip='0.0.0.0'", "--LabApp.token='password'", "--LabApp.allow_root=True"]
+#           volumeMounts:
+#           - mountPath: "/home/jovyan/work"
+#             name: local-storage
+#   volumeClaimTemplates:
+#   - metadata:
+#       name: local-storage
+#     spec:
+#       accessModes: [ "ReadWriteOnce" ]
+#       resources:
+#         requests:
+#           storage: 10Gi
 
 
 # spec:
