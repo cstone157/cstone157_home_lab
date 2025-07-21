@@ -21,6 +21,11 @@ spec:
             - containerPort: 8888
               name: jupyter-http
               protocol: TCP
+          env:
+          - name: JUPYTER_PORT
+            value: "8888"
+          - name: RESTARTABLE
+            value: "yes"
 #           securityContext:
 #             runAsUser: 1000
 #             runAsGroup: 100
