@@ -75,16 +75,16 @@ spec:
       volumes:
       - name: nifi-logs-pv
         persistentVolumeClaim: 
-          claimName: nifi-logs-pvc
+          claimName: {{ .Release.Name }}-nifi-logs-pvc
       - name: nifi-content-pv
         persistentVolumeClaim: 
-          claimName: nifi-content-pvc
+          claimName: {{ .Release.Name }}-nifi-content-pvc
       # - name: nifi-flowfile-pv
       #   persistentVolumeClaim: 
-      #     claimName: nifi-flowfile-pvc
+      #     claimName: {{ .Release.Name }}-nifi-flowfile-pvc
       # - name: nifi-db-pv
       #   persistentVolumeClaim: 
-      #     claimName: nifi-db-pvc
+      #     claimName: {{ .Release.Name }}-nifi-db-pvc
       # - name: nifi-provenance-pv
       #   persistentVolumeClaim: 
-      #     claimName: nifi-provenance-pvc
+      #     claimName: {{ .Release.Name }}-nifi-provenance-pvc
