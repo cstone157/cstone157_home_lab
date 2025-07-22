@@ -1,0 +1,90 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{ .Release.Name }}-nifi
+  labels:
+    app: nifi
+spec:
+  replicas: {{ .replicaCount }}
+  serviceName: nifi
+  selector:
+    matchLabels:
+      app: nifi
+  template:
+    metadata:
+      labels:
+        app: nifi
+    spec: 
+      containers:
+      - name: nifi-container
+        image: {{ .Values.Lab.Nifi.image }}
+        imagePullPolicy: IfNotPresent
+        resources: 
+          requests:
+            cpu: "2000m"
+            memory: "2Gi"
+          limits:
+            cpu: "4000m"
+            memory: "4Gi"
+            nvidia.com/gpu: "0"
+        volumeMounts:
+        - name: nifi-logs-pv
+          mountPath: /opt/nifi/nifi-current/logs
+        - name: nifi-content-pv
+          mountPath: /opt/nifi/nifi-current/content-repository
+      #   - name: nifi-flowfile-pv
+      #     mountPath: /opt/nifi/nifi-current/flowfile-repository
+      #   - name: nifi-db-pv
+      #     mountPath: /opt/nifi/nifi-current/database-repository
+      #   - name: nifi-provenance-pv
+      #     mountPath: /opt/nifi/nifi-current/provenance-repository
+        ports:
+        - containerPort: {{ .Values.Lab.Nifi.HttpPort.port }}
+          name: {{ .Values.Lab.Nifi.HttpPort.name }}
+        - containerPort: {{ .Values.Lab.Nifi.HttpsPort.port }}
+          name: {{ .Values.Lab.Nifi.HttpsPort.name }}
+        - containerPort: 31011
+          name: tcp-port1
+        - containerPort: 31012
+          name: tcp-port2
+        - containerPort: 31013
+          name: tcp-port3
+        - containerPort: 31014
+          name: tcp-port4
+        - containerPort: 31021
+          name: udp-port1
+        - containerPort: 31022
+          name: udp-port2
+        - containerPort: 31023
+          name: udp-port3
+        - containerPort: 31024
+          name: udp-port4
+        env:
+        - name: NIFI_WEB_HTTPS_HOST
+          value: {{ quote .Values.Lab.Nifi.env.host }}
+        - name: SINGLE_USER_CREDENTIALS_USERNAME
+          value: {{ quote .Values.Lab.Nifi.env.user }}
+        - name: SINGLE_USER_CREDENTIALS_PASSWORD
+          value: {{ quote .Values.Lab.Nifi.env.password }}
+        - name: NIFI_WEB_HTTPS_PORT
+          value: {{ quote .Values.Lab.Nifi.HttpsPort.port }}
+        - name: NIFI_WEB_HTTP_PORT
+          value: {{ quote .Values.Lab.Nifi.HttpPort.port }}
+      #   - name: VERSION
+      #     value: "1.10"
+      volumes:
+      - name: nifi-logs-pv
+        persistentVolumeClaim: 
+          claimName: nifi-logs-pvc
+      - name: nifi-content-pv
+        persistentVolumeClaim: 
+          claimName: nifi-content-pvc
+      # - name: nifi-flowfile-pv
+      #   persistentVolumeClaim: 
+      #     claimName: nifi-flowfile-pvc
+      # - name: nifi-db-pv
+      #   persistentVolumeClaim: 
+      #     claimName: nifi-db-pvc
+      # - name: nifi-provenance-pv
+      #   persistentVolumeClaim: 
+      #     claimName: nifi-provenance-pvc

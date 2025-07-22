@@ -1,0 +1,69 @@
+# Logs persistent volume claim
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  labels:
+    app: nifi
+  name: {{ .Release.Name }}-nifi-logs-pvc
+  namespace: default
+spec:
+  accessModes: ["ReadWriteOnce"]
+  resources:
+    requests:
+      storage: 10Gi
+---
+# content repo persistent volume claim
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  labels:
+    app: nifi
+  name: {{ .Release.Name }}-nifi-content-pvc
+  namespace: default
+spec:
+  accessModes: ["ReadWriteOnce"]
+  resources:
+    requests:
+      storage: 10Gi      
+---
+# FlowFile repo persistent volume claim
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  labels:
+    app: nifi
+  name: {{ .Release.Name }}-nifi-flowfile-pvc
+  namespace: default
+spec:
+  accessModes: ["ReadWriteOnce"]
+  resources:
+    requests:
+      storage: 10Gi      
+---
+# database repo persistent volume claim
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  labels:
+    app: nifi
+  name: {{ .Release.Name }}-nifi-db-pvc
+  namespace: default
+spec:
+  accessModes: ["ReadWriteOnce"]
+  resources:
+    requests:
+      storage: 10Gi      
+---
+# provenance repo persistent volume claim
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  labels:
+    app: nifi
+  name: {{ .Release.Name }}-nifi-provenance-pvc
+  namespace: default
+spec:
+  accessModes: ["ReadWriteOnce"]
+  resources:
+    requests:
+      storage: 10Gi      

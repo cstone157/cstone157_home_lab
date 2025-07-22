@@ -1,0 +1,67 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Release.Name }}-nifi
+spec:
+  selector:
+    app: nifi
+  type: NodePort  # Use LoadBalancer if you're on a cloud that supports it
+  ports:
+  - protocol: TCP
+    #port: 8080
+    port: 31000
+    name: http-port
+    nodePort: 31000
+  - protocol: TCP
+    #port: 8443
+    port: 31001
+    name: https-port
+    nodePort: 31001
+  - protocol: TCP
+    port: 31011
+    name: tcp-port1
+    nodePort: 31011
+  - protocol: TCP
+    port: 31012
+    name: tcp-port2
+    nodePort: 31012
+  - protocol: TCP
+    port: 31013
+    name: tcp-port3
+    nodePort: 31013
+  - protocol: TCP
+    port: 31014
+    name: tcp-port4
+    nodePort: 31014
+  - protocol: UDP
+    port: 31021
+    name: udp-port1
+    nodePort: 31021
+  - protocol: UDP
+    port: 31022
+    name: udp-port2
+    nodePort: 31022
+  - protocol: UDP
+    port: 31023
+    name: udp-port3
+    nodePort: 31023
+  - protocol: UDP
+    port: 31024
+    name: udp-port4
+    nodePort: 31024
+  # type: LoadBalancer 
+
+# apiVersion: v1
+# kind: Service
+# metadata:
+#   name: nifi-service
+# spec:
+#   selector:
+#     app: nifi
+#   ports:
+#   - protocol: TCP
+#     port: 11434
+#     targetPort: 11434
+#   - protocol: UDP
+#     port: 11434
+#     targetPort: 11434
