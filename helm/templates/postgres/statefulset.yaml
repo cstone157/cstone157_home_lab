@@ -1,0 +1,26 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{ .Release.Name }}-postgres
+  labels:
+    app: postgres
+spec:
+  replicas: {{ .replicaCount }}
+  serviceName: postgres
+  selector:
+    matchLabels:
+      app: postgres
+  template:
+    metadata:
+      labels:
+        app: postgres
+    spec:
+      containers:
+      - name: postgres
+        image: {{ .Values.Lab.Postgres.image }}
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: {{ .Values.Lab.Postgres.port }}
+        env:
+        - name: POSTGRES_PASSWORD
+          value: {{ quote .Values.Lab.Postgres.password }}
