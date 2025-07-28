@@ -1,5 +1,35 @@
-Release:
-  Name: lab
+#Release:
+#  Name: lab
+
+postgresql:
+  image: postgres:16.0
+  imagePullPolicy: IfNotPresent
+  replicas: 1
+  port: 5432
+# == From Gemini
+  storage:
+    size: 10Gi
+    storageClassName: # Your storage class name (optional)
+  resources:
+    limits:
+      cpu: 1
+      memory: 2Gi
+    requests:
+      cpu: 500m
+      memory: 1Gi
+  postgresPassword: # Retrieve the password from secrets
+    name: lab-secrets
+    passwordKey: db-admin-password
+  postgresUser: postgres    # optional
+  postgresDB: postgresdb
+  service:
+    type: ClusterIP # Or LoadBalancer if you need external access
+    port: 5432
+    name: postgresql
+  securityContext:
+    runAsUser: 999  # Non-root user for security
+    runAsGroup: 999
+    fsGroup: 999
 
 Lab:
   Jupyter:
@@ -39,10 +69,6 @@ Lab:
     env:
       email: admin@email.com
       password: admin
-  Postgres:
-    image: postgres:16.0
-    password: postgres
-    port: 5432
   WebUi:
     image: ghcr.io/open-webui/open-webui:main
     HttpPort:
@@ -50,6 +76,7 @@ Lab:
       port: 8080
       targetPort: 8080
       nodePort: 30000
+
 
 
 
