@@ -3,6 +3,8 @@
 
 postgresql:
   image: postgres:16.0
+  # Use the timescaledb, since includes ai extension, since rke2 blocks a lot of the apt-get stuff
+  #image: timescale/timescaledb-ha:pg16
   imagePullPolicy: IfNotPresent
   replicas: 1
   port: 5432
