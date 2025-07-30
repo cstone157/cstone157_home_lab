@@ -1,12 +1,11 @@
-# pvc.yaml
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: registry-data
+  name: registry-pvc # Consistent name for the claim
 spec:
   accessModes:
-    - ReadWriteOnce  # Adjust based on your storage
+    - ReadWriteOnce # Or ReadWriteMany if your storage supports it
   resources:
     requests:
-      storage: 10Gi  # Adjust the size as needed
-  storageClassName: your-storage-class # Important: Replace with your StorageClass!
+      storage: 10Gi #  Adjust the storage size as needed
+  storageClassName: standard # Or your preferred storage class

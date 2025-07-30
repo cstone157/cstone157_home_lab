@@ -1,12 +1,13 @@
-# service.yaml
 apiVersion: v1
 kind: Service
 metadata:
-  name: docker-registry
+  name: image-repository
 spec:
-  type: LoadBalancer # Or NodePort, ClusterIP, etc.
-  ports:
-  - port: 5000
-    targetPort: 5000
+  type: ClusterIP  # Or LoadBalancer for external access
   selector:
-    app: docker-registry
+    app: image-repository
+  ports:
+  - protocol: TCP
+    port: 5000     # Expose on HTTPS port externally
+    targetPort: 5000  # Forward to the registry container's port
+    name: https

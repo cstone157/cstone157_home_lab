@@ -1,0 +1,19 @@
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  labels:
+    app: image-repository
+  name: image-repository-ingress
+  namespace: lab-test
+spec:
+  dnsNames:
+  - registry.tmdash2.lab.shocn.lan
+  issuerRef:
+    group: adcs.certmanager.csf.nokia.com
+    kind: ClusterAdcsIssuer
+    name: adcs-cluster-issuer
+  renewBefore: 48h0m0s
+  secretName: image-repository-tls-ingress
+  usages:
+  - digital signature
+  - key encipherment
