@@ -1,0 +1,45 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{ .Release.Name }}-ollama
+  labels:
+    app: ollama
+spec:
+  replicas: {{ .replicaCount }}
+  serviceName: ollama
+  selector:
+    matchLabels:
+      app: ollama
+  template:
+    metadata:
+      labels:
+        app: ollama
+    spec:
+      containers:
+      - name: ollama
+        image: {{ .Values.Lab.Ollama.image }}
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: {{ .Values.Lab.Ollama.HttpPort.port }}
+          protocol: {{ .Values.Lab.Ollama.HttpPort.protocol }}
+        env:
+        - name: PRELOAD_MODELS
+          value: "mistral:7b"
+        - name: OLLAMA_KEEP_ALIVE
+          value: "12h"
+        lifecycle:
+          postStart:
+            exec:
+              command: ["/bin/sh", "-c", "for model in $PRELOAD_MODELS; do ollama run $model \"\"; done"]
+        volumeMounts:
+        - name: ollama-volume
+          mountPath: /root/.ollama
+        tty: true
+  volumeClaimTemplates:
+  - metadata:
+      name: ollama-volume
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      resources:
+        requests:
+          storage: 30Gi

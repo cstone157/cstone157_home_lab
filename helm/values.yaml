@@ -1,0 +1,86 @@
+#Release:
+#  Name: lab
+
+postgresql:
+  image: postgres:16.0
+  # Use the timescaledb, since includes ai extension, since rke2 blocks a lot of the apt-get stuff
+  #image: timescale/timescaledb-ha:pg16
+  imagePullPolicy: IfNotPresent
+  replicas: 1
+  port: 5432
+# == From Gemini
+  storage:
+    size: 10Gi
+    storageClassName: # Your storage class name (optional)
+  resources:
+    limits:
+      cpu: 1
+      memory: 2Gi
+    requests:
+      cpu: 500m
+      memory: 1Gi
+  postgresPassword: # Retrieve the password from secrets
+    name: lab-secrets
+    passwordKey: db-admin-password
+  postgresUser: postgres    # optional
+  postgresDB: postgresdb
+  service:
+    type: ClusterIP # Or LoadBalancer if you need external access
+    port: 5432
+    name: postgresql
+  securityContext:
+    runAsUser: 999  # Non-root user for security
+    runAsGroup: 999
+    fsGroup: 999
+
+Lab:
+  Jupyter:
+    image: jupyter/minimal-notebook:notebook-7.0.6
+    HttpPort:
+      name: jupyter-http
+      protocol: TCP
+      nodePort: 30020
+      port: 8888
+  Ollama:
+    image: ollama/ollama:0.9.6
+    HttpPort:
+      protocol: TCP
+      targetPort: 11434
+      port: 11434
+  Nifi:
+    image: apache/nifi:2.4.0
+    env:
+      host: 0.0.0.0
+      user: admin
+      password: password123456789
+    HttpPort:
+      protocol: TCP
+      port: 31000
+      name: http-port
+    HttpsPort:
+      protocol: TCP
+      port: 31001
+      name: https-port
+  PgAdmin:
+    image: dpage/pgadmin4:7.8
+    HttpPort:
+      name: pgadmin-port
+      port: 80
+      targetPort: 80
+      nodePort: 30010
+    env:
+      email: admin@email.com
+      password: admin
+  WebUi:
+    image: ghcr.io/open-webui/open-webui:main
+    HttpPort:
+      protocol: TCP
+      port: 8080
+      targetPort: 8080
+      nodePort: 30000
+
+
+
+
+# This will set the replicaset count more information can be found here: https://kubernetes.io/docs/concepts/workloads/controllers/replicaset/
+replicaCount: 1

@@ -1,0 +1,41 @@
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: jupyter-notebook
+  namespace: stone-data-lake
+  labels:
+    app: jupyter-notebook
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: jupyter-notebook
+  template:
+    metadata:
+      labels:
+        app: jupyter-notebook
+    spec:
+      containers:
+      - name: minimal-notebook
+        #image: jupyter/minimal-notebook:latest
+        image: localhost:5000/data-lake-jupyter
+        ports:
+        - containerPort: 8888
+        command: ["start-notebook.sh"]
+        args: ["--NotebookApp.token=''"]
+        volumeMounts:
+        - mountPath: "/home/jovyan/work"
+          name: local-storage
+      volumes:
+      - name: local-storage
+        persistentVolumeClaim:
+          claimName: example-local-pvc
+#        volumeMounts: 
+#        - mountPath: /home/jovyan/work
+#          name: jupyter-work-volume
+#          #readOnly: false
+#      volumes: 
+#      - name: jupyter-work-volume
+#        hostPath:
+#          path: work
