@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: rstudio-server
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: rstudio
+  template:
+    metadata:
+      labels:
+        app: rstudio
+    spec:
+      containers:
+        - name: rstudio
+          image: rocker/rstudio:4.2.2
+          imagePullPolicy: "IfNotPresent"
+          env:
+            - name: USERNAME
+              value: "rstudio"
+            - name: PASSWORD
+              value: "password"
+          ports:
+            - containerPort: 8787
+          volumeMounts:
+            - name: rstudio-data
+              mountPath: /home/rstudio 
+      volumes:
+        - name: rstudio-data
+          persistentVolumeClaim:
+            claimName: rstudio-pvc

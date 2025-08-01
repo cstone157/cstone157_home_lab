@@ -1,0 +1,24 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: rstudio-local-pv
+spec:
+  capacity:
+    storage: 10Gi
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: local-storage 
+  local:
+    path: /home/cstone/rstudio-data 
+  nodeAffinity:
+    required:
+      nodeSelectorTerms:
+        - matchExpressions:
+            - key: kubernetes.io/hostname
+              operator: In
+              values:
+                - lima-rancher-desktop
+  # nodeSelector:
+  #   matchLabels:
+  #     kubernetes.io/hostname: lima-rancher-desktop 
