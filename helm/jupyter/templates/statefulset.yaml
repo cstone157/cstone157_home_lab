@@ -27,4 +27,15 @@ spec:
           - name: RESTARTABLE
             value: "yes"
           image: {{ .Values.Lab.Jupyter.image }}
- 
+          volumeMounts: 
+          - mountPath: /home/jovyan/work
+            name: jupyter-pvc
+      volumes:
+      - name: jupyter-pvc
+        persistentVolumeClaim:
+          claimName: jupyter-pvc
+        #readOnly: false
+      # volumes: 
+      # - name: jupyter-work-volume
+      #   hostPath:
+      #     path: work

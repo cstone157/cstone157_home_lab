@@ -10,7 +10,7 @@ spec:
   persistentVolumeReclaimPolicy: Retain
   storageClassName: local-storage 
   local:
-    path: /home/cstone/rstudio-data 
+    path: /home/cstone157/rstudio-data 
   nodeAffinity:
     required:
       nodeSelectorTerms:

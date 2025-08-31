@@ -10,7 +10,7 @@ spec:
   persistentVolumeReclaimPolicy: Retain
   storageClassName: local-storage 
   local:
-    path: /home/cstone/jupyter-data
+    path: /home/cstone157/jupyter-data
   nodeAffinity:
     required:
       nodeSelectorTerms:
