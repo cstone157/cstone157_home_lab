@@ -1,22 +1,22 @@
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
-  name: {{ .Release.Name }}-jupyter
+  name: {{ .Values.Lab.Jupyter.name }}
   labels:
-    app: jupyter
+    app: {{ .Values.Lab.Jupyter.label }}
 spec:
   replicas: {{ .replicaCount }}
-  serviceName: jupyter
+  serviceName: {{ .Values.Lab.Jupyter.name }}
   selector:
     matchLabels:
-      app: jupyter
+      app: {{ .Values.Lab.Jupyter.selector_name }}
   template:
     metadata:
       labels:
-        app: jupyter
+        app: {{ .Values.Lab.Jupyter.selector_name }}
     spec:
       containers:
-        - name: jupyter
+        - name: {{ .Values.Lab.Jupyter.name }}
           ports:
             - containerPort: {{ .Values.Lab.Jupyter.HttpPort.port  }}
               name: {{ .Values.Lab.Jupyter.HttpPort.name  }}

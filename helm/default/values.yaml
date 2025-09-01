@@ -34,8 +34,19 @@ postgresql:
     fsGroup: 999
 
 Lab:
+  persistent_volume:
+    access_modes: ReadWriteOnce
+    persistent_volume_reclaim_policy: Retain
+    storage_class_name: local-storage 
+    volume_path: /home/cstone157
+
   Jupyter:
     image: jupyter/minimal-notebook:notebook-7.0.6
+    name: jupyter
+    label: jupyter
+    selector_name: jupyter
+    volume_name: jupyter-local-pv
+    volume_folder_name: jupyter-data
     HttpPort:
       name: jupyter-http
       protocol: TCP
