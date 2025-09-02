@@ -40,18 +40,38 @@ Lab:
     storage_class_name: local-storage 
     volume_path: /home/cstone157
 
+
   Jupyter:
     image: jupyter/minimal-notebook:notebook-7.0.6
     name: jupyter
     label: jupyter
     selector_name: jupyter
-    volume_name: jupyter-local-pv
-    volume_folder_name: jupyter-data
+    volume:
+      # name: jupyter-local-pv # DELTE ME, unecissary
+      folder_name: jupyter-data
+      mount_path: /home/jovyan/work
+      size: 10Gi
     HttpPort:
       name: jupyter-http
       protocol: TCP
       nodePort: 30020
       port: 8888
+  RStudio:
+    image: jupyter/minimal-notebook:notebook-7.0.6
+    name: jupyter
+    label: jupyter
+    selector_name: jupyter
+    volume:
+      # name: jupyter-local-pv # DELTE ME, unecissary
+      folder_name: jupyter-data
+      mount_path: /home/jovyan/work
+      size: 10Gi
+    HttpPort:
+      name: jupyter-http
+      protocol: TCP
+      nodePort: 30020
+      port: 8888
+
   Ollama:
     image: ollama/ollama:0.9.6
     HttpPort:

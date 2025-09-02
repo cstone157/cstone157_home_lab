@@ -1,11 +1,11 @@
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: jupyter-pvc
+  name: {{ .Values.Lab.Jupyter.name }}-pvc
 spec:
   accessModes:
-    - ReadWriteOnce
+    - {{ .Values.Lab.persistent_volume.access_modes }}
   resources:
     requests:
-      storage: 10Gi 
-  storageClassName: local-storage
+      storage: {{ .Values.Lab.Jupyter.volume.size }} 
+  storageClassName: {{ .Values.Lab.persistent_volume.storage_class_name }} 

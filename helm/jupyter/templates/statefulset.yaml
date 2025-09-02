@@ -28,12 +28,12 @@ spec:
             value: "yes"
           image: {{ .Values.Lab.Jupyter.image }}
           volumeMounts: 
-          - mountPath: /home/jovyan/work
-            name: jupyter-pvc
+          - mountPath: {{ .Values.Lab.Jupyter.volume.mount_path }} 
+            name: {{ .Values.Lab.Jupyter.name }}-pvc
       volumes:
-      - name: jupyter-pvc
+      - name: {{ .Values.Lab.Jupyter.name }}-pvc
         persistentVolumeClaim:
-          claimName: jupyter-pvc
+          claimName: {{ .Values.Lab.Jupyter.name }}-pvc
         #readOnly: false
       # volumes: 
       # - name: jupyter-work-volume
