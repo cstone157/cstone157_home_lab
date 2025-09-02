@@ -57,20 +57,19 @@ Lab:
       nodePort: 30020
       port: 8888
   RStudio:
-    image: jupyter/minimal-notebook:notebook-7.0.6
-    name: jupyter
-    label: jupyter
-    selector_name: jupyter
+    image: rocker/rstudio:4.2.2
+    name: rstudio
+    label: rstudio
+    selector_name: rstudio
     volume:
-      # name: jupyter-local-pv # DELTE ME, unecissary
-      folder_name: jupyter-data
-      mount_path: /home/jovyan/work
+      folder_name: rstudio-data
+      mount_path: /home/rstudio 
       size: 10Gi
     HttpPort:
-      name: jupyter-http
+      name: rstudio-http
       protocol: TCP
-      nodePort: 30020
-      port: 8888
+      nodePort: 30000
+      port: 8787
 
   Ollama:
     image: ollama/ollama:0.9.6

@@ -27,6 +27,7 @@ spec:
           - name: RESTARTABLE
             value: "yes"
           image: {{ .Values.Lab.Jupyter.image }}
+          imagePullPolicy: "IfNotPresent"
           volumeMounts: 
           - mountPath: {{ .Values.Lab.Jupyter.volume.mount_path }} 
             name: {{ .Values.Lab.Jupyter.name }}-pvc
@@ -34,8 +35,3 @@ spec:
       - name: {{ .Values.Lab.Jupyter.name }}-pvc
         persistentVolumeClaim:
           claimName: {{ .Values.Lab.Jupyter.name }}-pvc
-        #readOnly: false
-      # volumes: 
-      # - name: jupyter-work-volume
-      #   hostPath:
-      #     path: work
