@@ -20,15 +20,19 @@ spec:
           ports:
             - containerPort: {{ .Values.Lab.RStudio.HttpPort.port  }}
           env:
-            - name: USERNAME
-              value: "rstudio"
-            - name: PASSWORD
-              value: "password"
+          {{- range .Values.Lab.RStudio.env }}
+            - name: {{ .name }}
+              value: {{ .value | quote }}
+          {{- end }}
+            # - name: USERNAME
+            #   value: "rstudio"
+            # - name: PASSWORD
+            #   value: "password"
           image: {{ .Values.Lab.RStudio.image }}
           imagePullPolicy: "IfNotPresent"
           volumeMounts:
-            - name: {{ .Values.Lab.RStudio.name }}
-              mountPath: {{ .Values.Lab.RStudio.volume.mount_path }}
+            - mountPath: {{ .Values.Lab.RStudio.volume.mount_path }}
+              name: {{ .Values.Lab.RStudio.name }}-pvc
       volumes:
         - name: {{ .Values.Lab.RStudio.name }}-pvc
           persistentVolumeClaim:
