@@ -61,6 +61,11 @@ Lab:
     name: rstudio
     label: rstudio
     selector_name: rstudio
+    env:
+      - name: USERNAME
+        value: "rstudio"
+      - name: PASSWORD
+        value: "password"
     volume:
       folder_name: rstudio-data
       mount_path: /home/rstudio 
