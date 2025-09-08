@@ -44,13 +44,48 @@ postgres:
     fsGroup: 999
 
 Lab:
+  persistent_volume:
+    access_modes: ReadWriteOnce
+    persistent_volume_reclaim_policy: Retain
+    storage_class_name: local-storage 
+    volume_path: /home/cstone157
+
+
   Jupyter:
     image: jupyter/minimal-notebook:notebook-7.0.6
+    name: jupyter
+    label: jupyter
+    selector_name: jupyter
+    volume:
+      # name: jupyter-local-pv # DELTE ME, unecissary
+      folder_name: jupyter-data
+      mount_path: /home/jovyan/work
+      size: 10Gi
     HttpPort:
       name: jupyter-http
       protocol: TCP
       nodePort: 30020
       port: 8888
+  RStudio:
+    image: rocker/rstudio:4.2.2
+    name: rstudio
+    label: rstudio
+    selector_name: rstudio
+    env:
+      - name: USERNAME
+        value: "rstudio"
+      - name: PASSWORD
+        value: "password"
+    volume:
+      folder_name: rstudio-data
+      mount_path: /home/rstudio 
+      size: 10Gi
+    HttpPort:
+      name: rstudio-http
+      protocol: TCP
+      nodePort: 30000
+      port: 8787
+
   Ollama:
     image: ollama/ollama:0.9.6
     HttpPort:

@@ -9,3 +9,13 @@ spec:
     requests:
       storage: 10Gi 
   storageClassName: local-storage
+#   name: {{ .Values.Lab.RStudio.name }}-pvc
+# spec:
+#   accessModes:
+#     - {{ .Values.Lab.persistent_volume.access_modes }}
+#   resources:
+#     requests:
+#       storage: {{ .Values.Lab.RStudio.volume.size }}  
+#   storageClassName: {{ .Values.Lab.persistent_volume.storage_class_name }} 
+#   volumeMode: Filesystem
+#   volumeName: rstudio-local-pv

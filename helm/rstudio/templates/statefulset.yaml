@@ -1,0 +1,39 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{ .Values.Lab.RStudio.name }}
+  labels:
+    app: {{ .Values.Lab.RStudio.label }}
+spec:
+  replicas: {{ .replicaCount }}
+  serviceName: {{ .Values.Lab.RStudio.name }}
+  selector:
+    matchLabels:
+      app: {{ .Values.Lab.RStudio.name }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.Lab.RStudio.name }}
+    spec:
+      containers:
+        - name: {{ .Values.Lab.RStudio.name }}
+          ports:
+            - containerPort: {{ .Values.Lab.RStudio.HttpPort.port  }}
+          env:
+          {{- range .Values.Lab.RStudio.env }}
+            - name: {{ .name }}
+              value: {{ .value | quote }}
+          {{- end }}
+            # - name: USERNAME
+            #   value: "rstudio"
+            # - name: PASSWORD
+            #   value: "password"
+          image: {{ .Values.Lab.RStudio.image }}
+          imagePullPolicy: "IfNotPresent"
+          volumeMounts:
+            - mountPath: {{ .Values.Lab.RStudio.volume.mount_path }}
+              name: {{ .Values.Lab.RStudio.name }}-pvc
+      volumes:
+        - name: {{ .Values.Lab.RStudio.name }}-pvc
+          persistentVolumeClaim:
+            claimName: {{ .Values.Lab.RStudio.name }}-pvc

@@ -10,3 +10,13 @@ spec:
   - protocol: TCP
     nodePort: 30000
     port: 8787
+#   name: {{ .Values.Lab.RStudio.name }}
+# spec:
+#   type: NodePort
+#   selector:
+#     app: {{ .Values.Lab.RStudio.name }}
+#   ports:
+#   - protocol: {{ .Values.Lab.RStudio.HttpPort.protocol }}
+#     nodePort: {{ .Values.Lab.RStudio.HttpPort.nodePort }}
+#     port: {{ .Values.Lab.RStudio.HttpPort.port }}
+
