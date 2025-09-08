@@ -6,7 +6,7 @@ metadata:
     app: postgres
     release: {{ .Release.Name }}
 spec:
-  replicas: {{ .Values.postgresql.replicas }}
+  replicas: {{ .Values.postgres.replicas }}
   selector:
     matchLabels:
       app: postgres
@@ -19,35 +19,36 @@ spec:
         release: {{ .Release.Name }}
     spec:
       securityContext:
-        {{- toYaml .Values.postgresql.securityContext | nindent 8 }}
+        {{- toYaml .Values.postgres.securityContext | nindent 8 }}
       containers:
       - name: postgres
-        image: {{ .Values.postgresql.image }}
-        imagePullPolicy: {{ .Values.postgresql.imagePullPolicy |  default "IfNotPresent" }}
+        image: {{ .Values.postgres.image }}
+        imagePullPolicy: {{ .Values.postgres.imagePullPolicy |  default "IfNotPresent" }}
         resources:
-          {{- toYaml .Values.postgresql.resources | nindent 12 }}        
+          {{- toYaml .Values.postgres.resources | nindent 12 }}        
         ports:
-        - containerPort: {{ .Values.postgresql.service.port }}
+        - containerPort: {{ .Values.postgres.service.port }}
           name: postgresql
         env:
         - name: POSTGRES_USER
-          value: {{ default "postgres" .Values.postgresql.postgresUser | quote }}
+          value: {{ default "postgres" .Values.postgres.postgresUser | quote }}
         - name: POSTGRES_PASSWORD
-          valueFrom:
-            secretKeyRef:
-              name: {{ .Values.postgresql.postgresPassword.name }}
-              key: {{ .Values.postgresql.postgresPassword.passwordKey }}
+          value: "password"
+          # valueFrom:
+          #   secretKeyRef:
+          #     name: {{ .Values.postgres.postgresPassword.name }}
+          #     key: {{ .Values.postgres.postgresPassword.passwordKey }}
         - name: POSTGRES_DB
-          value: {{ quote .Values.postgresql.postgresDB }}
-          volumeMounts:
-            - name: postgresql-data
-              mountPath: /var/lib/postgresql/data
-  volumeClaimTemplates:
-    - metadata:
-        name: postgresql-data
-      spec:
-        accessModes: [ "ReadWriteOnce" ]
-        storageClassName: {{ .Values.postgresql.storage.storageClassName | quote }}
-        resources:
-          requests:
-            storage: {{ .Values.postgresql.storage.size | quote }}
+          value: {{ quote .Values.postgres.postgresDB }}
+  #         volumeMounts:
+  #           - name: postgresql-data
+  #             mountPath: /var/lib/postgresql/data
+  # volumeClaimTemplates:
+  #   - metadata:
+  #       name: postgresql-data
+  #     spec:
+  #       accessModes: [ "ReadWriteOnce" ]
+  #       storageClassName: {{ .Values.postgres.storage.storageClassName | quote }}
+  #       resources:
+  #         requests:
+  #           storage: {{ .Values.postgres.storage.size | quote }}

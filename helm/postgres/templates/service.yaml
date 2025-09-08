@@ -1,14 +1,19 @@
+{{- $object := .Values.postgres -}}
+{{- $_ := set $object "version" .Values.version -}}
+{{- if not $object.namespace -}}
+  {{- $_ := set $object "namespace" .Values.namespace -}}
+{{- end }}
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ .Release.Name }}-postgres
-  labels:
-    app: postgres
+  name: {{ $object.name }}-service
+  namespace: {{ default $object.namespace "default" }}
+  {{- template "labchart.labels" $object }}
 spec:
   selector:
-    app: postgres
+    app: {{ coalesce $object.labels.app .name "unknown" }}
   ports:
   - name: postgres
-    port: {{ .Values.postgresql.service.port }}
-    targetPort: {{ .Values.postgresql.service.port }}
+    port: {{ $object.service.port }}
+    targetPort: {{ $object.service.port }}
   type: ClusterIP
