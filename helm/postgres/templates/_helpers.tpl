@@ -11,3 +11,12 @@
     {{- end }}
     {{- end }}
 {{- end }}
+
+{{/* Generate the metadata for the charts */}}
+{{- define "labchart.metadata" }}
+metadata:
+  name: {{ .name }}
+  namespace: {{ default "default" .namespace }}
+  {{- include "labchart.labels" . }}
+{{- end }}
+

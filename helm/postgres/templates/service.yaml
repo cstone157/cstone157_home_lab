@@ -5,10 +5,7 @@
 {{- end }}
 apiVersion: v1
 kind: Service
-metadata:
-  name: {{ $object.name }}-service
-  namespace: {{ default $object.namespace "default" }}
-  {{- template "labchart.labels" $object }}
+{{- template "labchart.metadata" $object }}
 spec:
   selector:
     app: {{ coalesce $object.labels.app .name "unknown" }}
