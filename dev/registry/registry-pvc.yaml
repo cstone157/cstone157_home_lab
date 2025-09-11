@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: registry-data
+  namespace: registry
+spec:
+  accessModes:
+    - ReadWriteOnce # Or ReadWriteMany if your storage provider supports it
+  resources:
+    requests:
+      storage: 10Gi # Adjust the size as needed
+#  storageClassName: standard # Or your specific storage class name
+#  Exclude the "storageClassName" so that we just use the default
