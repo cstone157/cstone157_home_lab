@@ -1,0 +1,49 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: docker-registry-ingress
+  namespace: registry
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-production # Replace with your ClusterIssuer name (or issuer if namespace-scoped)
+    nginx.ingress.kubernetes.io/ssl-redirect: "true" # Optional: Redirect HTTP to HTTPS
+    nginx.ingress.kubernetes.io/proxy-body-size: "0"  # Allow large image uploads
+    nginx.ingress.kubernetes.io/client-max-body-size: "0" # Allow large image uploads
+    # Add more annotations as needed for your ingress controller
+spec:
+  rules:
+  # - host: docker.yourdomain.com # Replace with your registry's domain name
+  #   http:
+  #     paths:
+  #     - path: /img-registry
+  #       pathType: Prefix
+  #       backend:
+  #         service:
+  #           name: docker-registry
+  #           port:
+  #             number: 5000
+  # - host: 127.0.0.1 # Replace with your registry's domain name
+  #   http:
+  #     paths:
+  #     - path: /img-registry
+  #       pathType: Prefix
+  #       backend:
+  #         service:
+  #           name: docker-registry
+  #           port:
+  #             number: 5000
+  - host: localhost # Replace with your registry's domain name
+    http:
+      paths:
+      - path: /img-registry
+        pathType: Prefix
+        backend:
+          service:
+            name: docker-registry
+            port:
+              number: 5000
+  tls:
+  - hosts:
+    - docker.yourdomain.com # Replace with your registry's domain name
+    - 127.0.0.1
+    - localhost
+    secretName: docker-registry-tls # Name of the secret where the certificate will be stored (cert-manager will create this)
