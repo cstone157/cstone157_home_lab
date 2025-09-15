@@ -1,0 +1,128 @@
+{{- if .Values.jupyter }}
+{{- $object := .Values.jupyter -}}
+{{- $_ := set $object "version" .Values.version -}}
+{{- if not $object.namespace -}}
+    {{- $_ := set $object "namespace" .Values.namespace -}}
+{{- end }}
+
+{{/* Add Service if they are required */}} 
+{{- template "mychart.service" $object }}
+
+{{/* Add Statefulset if they are required */}}
+{{- template "mychart.statefulset" $object }}
+
+{{/* Add PersistentVolumeClaims if they are required */}}
+{{- template "mychart.persistent_volume_claim" $object }}
+
+{{/* Add PersistentVolumes if they are required */}}
+{{- template "mychart.persistent_volume" $object }}
+
+{{/*
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+#   name: jupyter-local-pv
+# spec:
+#   capacity:
+#     storage: 10Gi
+#   accessModes:
+#     - ReadWriteOnce
+#   persistentVolumeReclaimPolicy: Retain
+#   storageClassName: local-storage 
+#   local:
+#     path: /home/cstone/jupyter-data
+  name: {{ $object.name }}-local-pv
+spec:
+  capacity:
+    storage: {{ $object.volume.size }}
+  accessModes:
+    - {{ .Values.Lab.persistent_volume.access_modes }}
+  persistentVolumeReclaimPolicy: {{ .Values.Lab.persistent_volume.persistent_volume_reclaim_policy }}
+  storageClassName: {{ .Values.Lab.persistent_volume.storage_class_name }} 
+  local:
+    path: {{ .Values.Lab.persistent_volume.volume_path }}/{{ $object.volume.folder_name }}
+  # nodeAffinity:
+  #   required:
+  #     nodeSelectorTerms:
+  #       - matchExpressions:
+  #           - key: kubernetes.io/hostname
+  #             operator: In
+  #             values:
+  #               - lima-rancher-desktop
+  # nodeSelector:
+  #   matchLabels:
+  #     kubernetes.io/hostname: lima-rancher-desktop 
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+#   name: jupyter-pvc
+# spec:
+#   accessModes:
+#     - ReadWriteOnce
+#   resources:
+#     requests:
+#       storage: 10Gi 
+#   storageClassName: local-storage
+  name: {{ $object.name }}-pvc
+spec:
+  accessModes:
+    - {{ .Values.Lab.persistent_volume.access_modes }}
+  resources:
+    requests:
+      storage: {{ $object.volume.size }} 
+  storageClassName: {{ .Values.Lab.persistent_volume.storage_class_name }} 
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: {{ $object.name }}
+spec:
+  type: NodePort
+  selector:
+    app: {{ $object.name }}
+  ports:
+  - protocol: {{ $object.HttpPort.protocol }}
+    nodePort: {{ $object.HttpPort.nodePort }}
+    port: {{ $object.HttpPort.port }}
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{ $object.name }}
+  labels:
+    app: {{ $object.label }}
+spec:
+  replicas: {{ .replicaCount }}
+  serviceName: {{ $object.name }}
+  selector:
+    matchLabels:
+      app: {{ $object.selector_name }}
+  template:
+    metadata:
+      labels:
+        app: {{ $object.selector_name }}
+    spec:
+      containers:
+        - name: {{ $object.name }}
+          ports:
+            - containerPort: {{ $object.HttpPort.port  }}
+              name: {{ $object.HttpPort.name  }}
+              protocol: {{ $object.HttpPort.protocol }}
+          env:
+          - name: JUPYTER_PORT  
+            value: {{ quote $object.HttpPort.port }}
+          - name: RESTARTABLE
+            value: "yes"
+          image: {{ $object.image }}
+          imagePullPolicy: "IfNotPresent"
+          volumeMounts: 
+          - mountPath: {{ $object.volume.mount_path }} 
+            name: {{ $object.name }}-pvc
+      volumes:
+      - name: {{ $object.name }}-pvc
+        persistentVolumeClaim:
+          claimName: {{ $object.name }}-pvc
+*/}}
+
+{{- end }}

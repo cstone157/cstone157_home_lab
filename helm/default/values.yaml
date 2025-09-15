@@ -9,6 +9,7 @@ version: "0.1a"
 # Postgresql : 
 # -----------------------------------------------------------
 postgres:
+  enabled: true
   labels:
     image: "postgres_version_16_0"
   name: postgres
@@ -17,31 +18,92 @@ postgres:
   image: postgres:16.0
   imagePullPolicy: IfNotPresent
   replicas: 1
-  port: 5432
-# == From Gemini
-  storage:
-    size: 10Gi
-    storageClassName: # Your storage class name (optional)
-  resources:
-    limits:
-      cpu: 1
-      memory: 2Gi
-    requests:
-      cpu: 500m
-      memory: 1Gi
-  postgresPassword: # Retrieve the password from secrets
-    name: lab-secrets
-    passwordKey: db-admin-password
-  postgresUser: postgres    # optional
-  postgresDB: postgresdb
+  env:
+    - name: POSTGRES_PASSWORD
+      value: "postgres"
+  service_type: ClusterIP
   service:
-    type: ClusterIP # Or LoadBalancer if you need external access
-    port: 5432
-    name: postgresql
+    - protocol: TCP
+      targetPort: 5432
+      port: 5432
   securityContext:
-    runAsUser: 999  # Non-root user for security
-    runAsGroup: 999
-    fsGroup: 999
+    runAsUser: 0  # Run as root user to user persistent volume
+    runAsGroup: 0
+    fsGroup: 0    
+  persistentVolume:
+    enabled: true
+    volumes:
+    - name: postgresql-data
+      mountPath: /home/postgres
+      accessModes: ["ReadWriteOnce"]
+      storage: 10Gi
+      persistentVolumeReclaimPolicy: Delete
+      storageClassName: local-path                                    # **ONLY FOR TESTING!  NOT FOR PRODUCTION!**
+      # To use a windows path : /run/desktop/mnt/host/c/PATH/TO/FILE
+      # hostPath: /run/desktop/mnt/c/k8/local-storage/postgres_data   # **ONLY FOR TESTING!  NOT FOR PRODUCTION!**
+      hostPath: /mnt/c/k8/local-storage/postgres_data                 # **ONLY FOR TESTING!  NOT FOR PRODUCTION!** # Working version for windows
+#   port: 5432
+# # == From Gemini
+#   storage:
+#     size: 10Gi
+#     storageClassName: # Your storage class name (optional)
+#   resources:
+#     limits:
+#       cpu: 1
+#       memory: 2Gi
+#     requests:
+#       cpu: 500m
+#       memory: 1Gi
+#   postgresPassword: # Retrieve the password from secrets
+#     name: lab-secrets
+#     passwordKey: db-admin-password
+#   postgresUser: postgres    # optional
+#   postgresDB: postgresdb
+#   service:
+#     type: ClusterIP # Or LoadBalancer if you need external access
+#     port: 5432
+#     name: postgresql
+#   securityContext:
+#     runAsUser: 999  # Non-root user for security
+#     runAsGroup: 999
+#     fsGroup: 999
+
+# ------------------------------------------------------------------------------
+# JupyterLab :
+# ------------------------------------------------------------------------------
+jupyter:
+  enabled: true
+  name: jupyter
+  image: jupyter/minimal-notebook:notebook-7.0.6  # jupyter/minimal-notebook:x86_64-python-3.11.6 # jupyter/datascience-notebook:x86_64-ubuntu-22.04
+  imagePullPolicy: IfNotPresent
+  replicas: 1
+  env:
+    - name: JUPYTER_PORT  
+      value: "8888"
+    - name: RESTARTABLE
+      value: "yes"
+  service_type: NodePort
+  service:
+    - protocol: TCP
+      nodePort: 30020
+      port: 8888
+  # Jupyter:
+  #   image: jupyter/minimal-notebook:notebook-7.0.6
+  #   name: jupyter
+  #   label: jupyter
+  #   selector_name: jupyter
+  #   volume:
+  #     # name: jupyter-local-pv # DELTE ME, unecissary
+  #     folder_name: jupyter-data
+  #     mount_path: /home/jovyan/work
+  #     size: 10Gi
+  #   HttpPort:
+  #     name: jupyter-http
+  #     protocol: TCP
+  #     nodePort: 30020
+  #     port: 8888
+
+
 
 Lab:
   persistent_volume:
@@ -50,22 +112,6 @@ Lab:
     storage_class_name: local-storage 
     volume_path: /home/cstone157
 
-
-  Jupyter:
-    image: jupyter/minimal-notebook:notebook-7.0.6
-    name: jupyter
-    label: jupyter
-    selector_name: jupyter
-    volume:
-      # name: jupyter-local-pv # DELTE ME, unecissary
-      folder_name: jupyter-data
-      mount_path: /home/jovyan/work
-      size: 10Gi
-    HttpPort:
-      name: jupyter-http
-      protocol: TCP
-      nodePort: 30020
-      port: 8888
   RStudio:
     image: rocker/rstudio:4.2.2
     name: rstudio

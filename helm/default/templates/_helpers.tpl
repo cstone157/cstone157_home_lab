@@ -57,14 +57,15 @@ spec:
 {{- define "mychart.persistent_volume" }}
 {{/* If our pod is enabled and has a persistentVolume defined */}}
 {{- if and .enabled .persistentVolume }}
+{{- $object := . -}}
 {{/* # Loop through the defined volumes */}}
 {{- range .persistentVolume.volumes }}   
 ---
 apiVersion: v1
 kind: PersistentVolume
 metadata:
-  name: {{ .name }}-pv
-  namespace: {{ .namespace }}
+  name: {{ .name }}
+  namespace: {{ default "default" $object.namespace }}
 {{- template "mychart.metadata" . }}
 spec:
   storageClassName: {{ .storageClassName }}
@@ -83,20 +84,21 @@ spec:
 {{/* Generate a persistent volume's for my charts, based upon the passed object */}}
 {{- define "mychart.persistent_volume_claim" }}
 {{- if and .enabled .persistentVolume }}
+{{- $object := . -}}
 {{- range .persistentVolume.volumes }}
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: {{ .name }}-pvc
-  namespace: {{ .namespace }}
+  name: {{ .name }}
+  namespace: {{ default "default" $object.namespace }}
   labels:
     generator: helm
     date: {{ now | htmlDate }}
     app: {{ default "unknown" .name }}
     version: {{ default "unknown" .version | quote }}
 spec:
-  volumeName: {{ .name }}-pv
+  volumeName: {{ .name }}
   accessModes: {{ .accessModes }}
   storageClassName: {{ .storageClassName }}
   resources:
@@ -155,7 +157,7 @@ spec:
       {{- range .persistentVolume.volumes }}
       - name: {{ .name }}
         persistentVolumeClaim:
-          claimName: {{ .name }}-pvc
+          claimName: {{ .name }}
       {{- end }}
       {{- end }}
 {{- end }}

@@ -43,7 +43,7 @@ spec:
               number: 5000
   tls:
   - hosts:
-    - docker.yourdomain.com # Replace with your registry's domain name
-    - 127.0.0.1
     - localhost
+    # - docker.yourdomain.com # Replace with your registry's domain name
+    # - 127.0.0.1
     secretName: docker-registry-tls # Name of the secret where the certificate will be stored (cert-manager will create this)
