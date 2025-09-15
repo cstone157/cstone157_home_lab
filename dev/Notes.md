@@ -8,141 +8,40 @@
 
 ## 2.) Setup Development Enviroment
 
-- Installing Certificate manager (jetstack/cert-manager)
-    - Install using helm:
-        - Add the Jetstack Helm repository:
-        - <code>$ helm repo add jetstack https://charts.jetstack.io</code>
-        - Update your Helm repositories:
-        - <code>$ helm repo update</code>
-        - Install cert-manager using Helm:
-        - <code>$ helm install cert-manager jetstack/cert-manager --namespace cert-manager --create-namespace --version v1.13.2 --set installCRDs=true</code>
-    - Verify the Installation:
-        - After installing cert-manager using either method, it's crucial to verify that the installation was successful.
-        - <code>$ kubectl get pods --namespace cert-manager</code>
-        - You can also check the status of the Custom Resource Definitions (CRDs)
-        - Windows: <code>$ kubectl get crds</code>, Linux <code>$ kubectl get crds | grep cert-manager</code>
-    - Setting up an Issuer:
-        - cert-manager itself doesn't issue certificates. You need to configure an Issuer or ClusterIssuer resource to define how certificates will be obtained.
-        - <code>$ kubectl apply -f cert-manager/letsencrypt-staging-clusterissuer.yaml</code>
+- Installing Certificate manager (jetstack/cert-manager) (https://cert-manager.io/docs/installation/helm/) (https://medium.com/geekculture/a-simple-ca-setup-with-kubernetes-cert-manager-bc8ccbd9c2)
+    - Prerequisites:
+        - Install helm (https://helm.sh/docs/intro/install/)
+        - Install kubernetes (https://cert-manager.io/docs/releases/)
+    - Installing from the OCI Registry
+        - For simplicity, the cert-manager Helm charts are published to the same OCI registry as the cert-manager container images, at quay.io/jetstack
+        - <code>$ helm install cert-manager oci://quay.io/jetstack/charts/cert-manager --version v1.18.2 --namespace cert-manager --create-namespace --set crds.enabled=true</code>
 
-- Installing Docker Registry to Kubernetes (registry:2)
-    - Create namespace:
-        - <code>$ kubectl create namespace registry</code>
-    - Create a Persistent Volume Claim (PVC):
-        - <code>$ kubectl apply -f registry/registry-pvc.yaml</code>
-    - Create a Docker Registry Deployment:
-        - <code>$ kubectl apply -f registry/registry-deployment.yaml</code>
-    - Create a Docker Registry Service:
-        - <code>$ kubectl apply -f registry/registry-service.yaml</code>
-    - Create an Ingress Resource with cert-manager Integration:
-        - <code>$ kubectl apply -f registry/registry-ingress.yaml</code>
-    - :
-        - <code>$ </code>
-    - :
-        - <code>$ </code>
-
-
-
-
-
-
-
-
-    - :
-        - <code>$ </code>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-### Install Certificate manager (jetstack/cert-manager)
-
-- Install Certificate manager (jetstack/cert-manager)
-    - Add the Jetstack Helm Repository:
-        - <code>$ helm repo add jetstack https://charts.jetstack.io</code>
-        - <code>$ helm repo update</code>
-    - Create a Namespace (Recommended):
-        - <code>$ kubectl create namespace cert-manager</code>
-    - Install the cert-manager Helm Chart:
-        - <code>$ helm install cert-manager jetstack/cert-manager --namespace cert-manager --version v1.14.3 --set installCRDs=true</code>
-    - Verify the Installation:
-        - <code>$ kubectl -n cert-manager get pods</code>
-        - <code>$ kubectl -n cert-manager get deployments</code>
-        - <code>$ kubectl -n cert-manager get crds</code>
-        - Or
-        - <code>$ kubectl -n cert-manager get pods,deployments,crds</code>
-    - Check Cert-manager logs:
-        - <code>$ kubectl logs -n cert-manager -l app.kubernetes.io/name=cert-manager</code>
-
-- Post-Installation Configuration:
-    - Create a ClusterIssuer (Let's Encrypt): see cert-manager/letsencrypt-clusterissuer.yaml
-    - Apply the ClusterIssuer:
-        - <code>$ kubectl apply -f cert-manager/letsencrypt-clusterissuer.yaml</code>
-    - Create a Certificate: see cert-manager/my-website-certificate.yaml
-    - Apply the Certificate:
-        - <code>$ kubectl apply -f cert-manager/my-website-certificate.yaml</code>
-    - Configure your Ingress: see cert-manager/my-website-ingress.yaml
-
-### Install Registry
-
-- Installing Dcoker Registry
-    - Create namespace:
-        - <code>$ kubectl create namespace registry</code>
-    - Create a Persistent Volume Claim (PVC): see registry/registry-pvc.yaml
-    - Apply the pvc:
-        - <code>$ kubectl apply -f registry/registry-pvc.yaml</code>
-    - Verify that the PVC is bound to a Persistent Volume (PV):
-        - <code>$ kubectl get pvc -n registry registry-data</code>
-    - Create a Deployment for the Registry: see registry/registry-deployment.yaml
-    - Apply the Deployment:
-        - <code>$ kubectl apply -f registry\registry-deployment.yaml</code>
-    - Verify that the pod is running:
-        - <code>$ kubectl get pods -n registry -l app=docker-registry</code>
-    - Create a Service for the Registry: see registry\registry-service.yaml
-    - Apply the Service:
-        - <code>$ kubectl apply -f registry\registry-service.yaml</code>
+- Test cert-manager / use it to setup an ingress controller
+    - Create the namespace:
+        - <code>$ kubectl create namespace test</code>
+    - Create the issuer:
+        - <code>$ kubectl apply -f cert-manager/01-cert-manager-ss-issuer.yaml</code>
+    - Create the certificate:
+        - <code>$ kubectl apply -f cert-manager/02-cert-manager-ca-cert.yaml</code>
+    - Inspect the certificate:
+        - <code>$ kubectl -n test get certificate</code>
+    - Inspect the secret:
+        - <code>$ kubectl -n test get secret test-ca-secret</code>
+    - Create our CA issuer:
+        - <code>$ kubectl apply -f cert-manager/03-cert-manager-ca-issuer.yaml</code>
+    - Important to note here is that we will be using an Issuer and not a ClusterIssuer. The main difference between the two is that an Issuer can only issue certificates within the same namespace! If you want your CA to issue certificates in other namespaces as well, you will have to use the ClusterIssuer. See the <a href="https://cert-manager.io/docs/configuration/ca/">cert-manager documentation</a> for more info about this.
+    - Issue CA Signed Certificate:
+        - <code>$ kubectl apply -f cert-manager/04-test-server-cert.yaml</code>
+    - First validate if our server certificate against our CA:
+        - <code>$ openssl verify -CAfile <(kubectl -n test get secret test-ca-secret -o jsonpath='{.data.ca\.crt}' | base64 -d) <(kubectl -n test get secret test-server-tls -o jsonpath='{.data.tls\.crt}' | base64 -d)</code>
+    - Let’s now create a test server so we can try out our client certificate. Using openssl s_server utility, launch a server:
+        - <code>$ echo Hello World! > test.txt</code>
+        - <code>$ openssl s_server -cert <(kubectl -n test get secret test-server-tls -o jsonpath='{.data.tls\.crt}' | base64 -d) -key <(kubectl -n test get secret test-server-tls -o jsonpath='{.data.tls\.key}' | base64 -d) -CAfile <(kubectl -n test get secret test-server-tls -o jsonpath='{.data.ca\.crt}' | base64 -d) -WWW -port 12345  -verify_return_error -Verify 1</code>
+        - Our little test server running on port 12345 will serve Hello World! if all goes ok. Test it out as follows
+        - <code>$ echo -e 'GET /test.txt HTTP/1.1\r\n\r\n' | openssl s_client -cert <(kubectl -n test get secret test-client-tls -o jsonpath='{.data.tls\.crt}' | base64 -d) -key <(kubectl -n test get secret test-client-tls -o jsonpath='{.data.tls\.key}' | base64 -d) -CAfile <(kubectl -n test get secret test-client-tls -o jsonpath='{.data.ca\.crt}' | base64 -d) -connect localhost:12345 -quiet</code>
+    - Echo Server Setup with CA Signed Certificate:
+        - Let’s try our setup with a simple echo server using Ingress. When using minikube be sure to enable ingress:
+        - <code>$ kubectl create -f cert-manager/echo-server.yaml</code>
     - :
         - <code>$ </code>
     - :
@@ -151,5 +50,5 @@
         - <code>$ </code>
     - :
         - <code>$ </code>
-
+    - :
         - <code>$ </code>
