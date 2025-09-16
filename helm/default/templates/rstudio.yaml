@@ -1,0 +1,153 @@
+{{/*
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: rstudio-server
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: rstudio
+  template:
+    metadata:
+      labels:
+        app: rstudio
+    spec:
+      containers:
+        - name: rstudio
+          image: rocker/rstudio:4.2.2
+          imagePullPolicy: "IfNotPresent"
+          env:
+            - name: USERNAME
+              value: "rstudio"
+            - name: PASSWORD
+              value: "password"
+          ports:
+            - containerPort: 8787
+          volumeMounts:
+            - name: rstudio-data
+              mountPath: /home/rstudio 
+      volumes:
+        - name: rstudio-data
+          persistentVolumeClaim:
+            claimName: rstudio-pvc
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+#   name: rstudio-local-pv
+# spec:
+#   capacity:
+#     storage: 10Gi
+#   accessModes:
+#     - ReadWriteOnce
+#   persistentVolumeReclaimPolicy: Retain
+#   storageClassName: local-storage 
+#   local:
+#     path: /home/cstone/rstudio-data 
+  name: {{ .Values.Lab.RStudio.name }}-local-pv
+spec:
+  capacity:
+    storage: {{ .Values.Lab.RStudio.volume.size }}
+  accessModes:
+    - {{ .Values.Lab.persistent_volume.access_modes }}
+  persistentVolumeReclaimPolicy: {{ .Values.Lab.persistent_volume.persistent_volume_reclaim_policy }}
+  storageClassName: {{ .Values.Lab.persistent_volume.storage_class_name }} 
+  local:
+    path: {{ .Values.Lab.persistent_volume.volume_path }}/{{ .Values.Lab.RStudio.volume.folder_name }}
+  # nodeAffinity:
+  #   required:
+  #     nodeSelectorTerms:
+  #       - matchExpressions:
+  #           - key: kubernetes.io/hostname
+  #             operator: In
+  #             values:
+  #               - lima-rancher-desktop
+  # nodeSelector:
+  #   matchLabels:
+  #     kubernetes.io/hostname: lima-rancher-desktop 
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: rstudio-pvc
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 10Gi 
+  storageClassName: local-storage
+#   name: {{ .Values.Lab.RStudio.name }}-pvc
+# spec:
+#   accessModes:
+#     - {{ .Values.Lab.persistent_volume.access_modes }}
+#   resources:
+#     requests:
+#       storage: {{ .Values.Lab.RStudio.volume.size }}  
+#   storageClassName: {{ .Values.Lab.persistent_volume.storage_class_name }} 
+#   volumeMode: Filesystem
+#   volumeName: rstudio-local-pv
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: rstudio-server
+spec:
+  type: NodePort
+  selector:
+    app: rstudio
+  ports:
+  - protocol: TCP
+    nodePort: 30000
+    port: 8787
+#   name: {{ .Values.Lab.RStudio.name }}
+# spec:
+#   type: NodePort
+#   selector:
+#     app: {{ .Values.Lab.RStudio.name }}
+#   ports:
+#   - protocol: {{ .Values.Lab.RStudio.HttpPort.protocol }}
+#     nodePort: {{ .Values.Lab.RStudio.HttpPort.nodePort }}
+#     port: {{ .Values.Lab.RStudio.HttpPort.port }}
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{ .Values.Lab.RStudio.name }}
+  labels:
+    app: {{ .Values.Lab.RStudio.label }}
+spec:
+  replicas: {{ .replicaCount }}
+  serviceName: {{ .Values.Lab.RStudio.name }}
+  selector:
+    matchLabels:
+      app: {{ .Values.Lab.RStudio.name }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.Lab.RStudio.name }}
+    spec:
+      containers:
+        - name: {{ .Values.Lab.RStudio.name }}
+          ports:
+            - containerPort: {{ .Values.Lab.RStudio.HttpPort.port  }}
+          env:
+          {{- range .Values.Lab.RStudio.env }}
+            - name: {{ .name }}
+              value: {{ .value | quote }}
+          {{- end }}
+            # - name: USERNAME
+            #   value: "rstudio"
+            # - name: PASSWORD
+            #   value: "password"
+          image: {{ .Values.Lab.RStudio.image }}
+          imagePullPolicy: "IfNotPresent"
+          volumeMounts:
+            - mountPath: {{ .Values.Lab.RStudio.volume.mount_path }}
+              name: {{ .Values.Lab.RStudio.name }}-pvc
+      volumes:
+        - name: {{ .Values.Lab.RStudio.name }}-pvc
+          persistentVolumeClaim:
+            claimName: {{ .Values.Lab.RStudio.name }}-pvc
+*/}}

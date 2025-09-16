@@ -1,0 +1,151 @@
+{{- $object := .Values.ollama -}}
+{{- $_ := set $object "version" .Values.version -}}
+{{- if not $object.namespace -}}
+    {{- $_ := set $object "namespace" .Values.namespace -}}
+{{- end }}
+## Generate the Service using the helper function to create our service
+{{- template "mychart.service" $object }}
+
+{{- if $object.enabled }}
+---
+## Generate the StatefulSet for the ollama pod
+apiVersion: apps/v1
+kind: StatefulSet
+{{- template "mychart.metadata" $object }}
+spec:
+  replicas: {{ $object.replicas }}
+  serviceName: {{ $object.name }}
+  selector:
+    matchLabels:
+      app: {{ $object.name }}
+  template:
+    metadata:
+      labels:
+        app: {{ $object.name }}
+    spec:
+      containers:
+      - name: {{ $object.name }}
+        image: {{ $object.image }}
+        imagePullPolicy: {{ $object.imagePullPolicy }}
+        ports:
+        {{- range $object.service }}
+        - containerPort: {{ .port }}
+        {{- if .name }}
+          name: {{ .name }}
+        {{- end }}
+        {{- if .protocol }}
+          name: {{ .protocol }}
+        {{- end }}
+        {{- end }}
+        env:
+          {{- range $object.env }}
+          - name: {{ .name | quote }}
+            value: {{ .value | quote }}
+          {{- end }}
+  #       lifecycle:
+  #         postStart:
+  #           exec:
+  #             command: ["/bin/sh", "-c", "for model in $PRELOAD_MODELS; do ollama run $model \"\"; done"]
+        # resources: # Commendted out, everytime this resource setup is deployed on a rancher desktop it will crash
+        #   requests:
+        #     cpu: "2000m"
+        #     memory: "2Gi"
+        #   limits:
+        #     cpu: "4000m"
+        #     memory: "4Gi"
+        #     nvidia.com/gpu: "0"
+  #       volumeMounts:
+  #       - name: ollama-volume
+  #         mountPath: /root/.ollama
+  #       tty: true
+  # volumeClaimTemplates:
+  # - metadata:
+  #     name: ollama-volume
+  #   spec:
+  #     accessModes: [ "ReadWriteOnce" ]
+  #     resources:
+  #       requests:
+  #         storage: 30Gi
+
+# apiVersion: apps/v1
+# kind: Deployment
+# metadata:
+#   name: ollama
+# #  namespace: ollama
+# spec:
+#   selector:
+#     matchLabels:
+#       name: ollama
+#   template:
+#     metadata:
+#       labels:
+#         name: ollama
+#     spec:
+#       containers:
+#       - name: ollama
+#         image: ollama/ollama:latest
+#         ports:
+#         - name: http
+#           containerPort: 11434
+#           protocol: TCP
+{{- end }}
+
+{{/*
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Release.Name }}-ollama
+spec:
+  selector:
+    app: ollama
+  ports:
+  - protocol: {{ .Values.Lab.Ollama.HttpPort.protocol }}
+    port: {{ .Values.Lab.Ollama.HttpPort.port }}
+    targetPort: {{ .Values.Lab.Ollama.HttpPort.targetPort }}
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{ .Release.Name }}-ollama
+  labels:
+    app: ollama
+spec:
+  replicas: {{ .replicaCount }}
+  serviceName: ollama
+  selector:
+    matchLabels:
+      app: ollama
+  template:
+    metadata:
+      labels:
+        app: ollama
+    spec:
+      containers:
+      - name: ollama
+        image: {{ .Values.Lab.Ollama.image }}
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: {{ .Values.Lab.Ollama.HttpPort.port }}
+          protocol: {{ .Values.Lab.Ollama.HttpPort.protocol }}
+        env:
+        - name: PRELOAD_MODELS
+          value: "mistral:7b"
+        - name: OLLAMA_KEEP_ALIVE
+          value: "12h"
+        lifecycle:
+          postStart:
+            exec:
+              command: ["/bin/sh", "-c", "for model in $PRELOAD_MODELS; do ollama run $model \"\"; done"]
+        volumeMounts:
+        - name: ollama-volume
+          mountPath: /root/.ollama
+        tty: true
+  volumeClaimTemplates:
+  - metadata:
+      name: ollama-volume
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      resources:
+        requests:
+          storage: 30Gi
+*/}}

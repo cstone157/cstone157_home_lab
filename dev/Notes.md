@@ -42,8 +42,15 @@
     - Echo Server Setup with CA Signed Certificate:
         - Let’s try our setup with a simple echo server using Ingress. When using minikube be sure to enable ingress:
         - <code>$ kubectl create -f cert-manager/echo-server.yaml</code>
-    - :
-        - <code>$ </code>
+    - Edit the hosts file to include:
+        - <code>127.0.0.1    echo.info</code>
+        - The location of the hosts file varies by operating system:
+            - Windows: C:\Windows\System32\drivers\etc\hosts
+            - /etc/hosts
+    - Enable network tunneling
+
+
+
     - :
         - <code>$ </code>
     - :
