@@ -1,5 +1,5 @@
-{{- if .Values.jupyter }}
-{{- $object := .Values.jupyter -}}
+{{- if .Values.enabled }}
+{{- $object := .Values -}}
 {{- if not $object.version -}}
     {{- $_ := set $object "version" .Values.global.version -}}
 {{- end }}

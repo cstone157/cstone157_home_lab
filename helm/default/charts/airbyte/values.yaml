@@ -1,19 +1,18 @@
-global:
-  edition: enterprise
+# global:
+#   edition: enterprise
   
-  auth:
-    instanceAdmin:
-      firstName: Culver
-      lastName: Stone
-    identityProvider:
-      type: oidc
-      secretName: airbyte-config-secrets ## Name of your Kubernetes secret.
-      oidc:
-        domain: lab-test
-        appName: lab-test
-        display-name: lab-test
-        clientIdSecretKey: client-id
-        clientSecretSecretKey: client-secret
+#   auth:
+#     instanceAdmin:
+#       firstName: Culver
+#       lastName: Stone
+#     identityProvider:
+#       type: oidc
+#       secretName: airbyte-config-secrets ## Name of your Kubernetes secret.
+#       oidc:
+#         domain: lab-test
+#         appName: lab-test
+#         display-name: lab-test
+#         clientIdSecretKey: client-id
+#         clientSecretSecretKey: client-secret
 
-#airbyteUrl: # e.g. https://airbyte.company.example
-
+# #airbyteUrl: # e.g. https://airbyte.company.example

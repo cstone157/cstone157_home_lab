@@ -1,106 +1,105 @@
 # ------------------------------------------------------------------------------
 # Nifi :
 # ------------------------------------------------------------------------------
-nifi:
+enabled: true
+name: nifi
+image: apache/nifi:2.4.0 # apache/nifi:1.26.0
+imagePullPolicy: IfNotPresent
+replicas: 1
+env:
+  - name: NIFI_WEB_HTTPS_HOST
+    value: "0.0.0.0"
+  - name: SINGLE_USER_CREDENTIALS_USERNAME
+    value: "admin"
+  - name: SINGLE_USER_CREDENTIALS_PASSWORD
+    value: "password123456789" # Password must be a minimum of 12 characters, or system will generate a new one.
+  - name: NIFI_WEB_HTTPS_PORT
+    value: "31001"
+  - name: NIFI_WEB_HTTP_PORT
+    value: "31000"
+  #- name: NIFI_CLUSTER_ADDRESS
+  #  value: "10.5.101.181"
+  #- name: VERSION
+  #  value: "1.10"
+persistentVolume:
   enabled: true
-  name: nifi
-  image: apache/nifi:2.4.0 # apache/nifi:1.26.0
-  imagePullPolicy: IfNotPresent
-  replicas: 1
-  env:
-    - name: NIFI_WEB_HTTPS_HOST
-      value: "0.0.0.0"
-    - name: SINGLE_USER_CREDENTIALS_USERNAME
-      value: "admin"
-    - name: SINGLE_USER_CREDENTIALS_PASSWORD
-      value: "password123456789" # Password must be a minimum of 12 characters, or system will generate a new one.
-    - name: NIFI_WEB_HTTPS_PORT
-      value: "31001"
-    - name: NIFI_WEB_HTTP_PORT
-      value: "31000"
-    #- name: NIFI_CLUSTER_ADDRESS
-    #  value: "10.5.101.181"
-    #- name: VERSION
-    #  value: "1.10"
-  persistentVolume:
-    enabled: true
-    volumes:
-    - name: nifi-logs-pvc
-      mountPath: /opt/nifi/nifi-current/logs
-      accessModes: ["ReadWriteOnce"]
-      storage: 10Gi
-      persistentVolumeReclaimPolicy: Delete
-      storageClassName: local-path                  # **ONLY FOR TESTING!  NOT FOR PRODUCTION!**
-      hostPath: C:\k8\local-storage\nifi\logs   # **ONLY FOR TESTING!  NOT FOR PRODUCTION!**
-  # pvc:
-  #   - name: nifi-logs-pvc
-  #     storage: 10Gi
-  #     accessModes: ["ReadWriteOnce"]
-  #   - name: nifi-content-pvc
-  #     storage: 10Gi
-  #     accessModes: ["ReadWriteOnce"]
-  #   - name: nifi-flowfile-pvc
-  #     storage: 10Gi
-  #     accessModes: ["ReadWriteOnce"]
-  #   - name: nifi-db-pvc
-  #     storage: 10Gi
-  #     accessModes: ["ReadWriteOnce"]
-  #   - name: nifi-provenance-pvc
-  #     storage: 10Gi
-  #     accessModes: ["ReadWriteOnce"]
-  service_type: NodePort
-  service:
-  - protocol: TCP
-    port: 31000
-    name: http-port
-    nodePort: 31000
-  - protocol: TCP
-    port: 31001
-    name: https-port
-    nodePort: 31001
-  - protocol: TCP
-    port: 31011
-    name: tcp-port1
-    nodePort: 31011
-  - protocol: TCP
-    port: 31012
-    name: tcp-port2
-    nodePort: 31012
-  - protocol: TCP
-    port: 31013
-    name: tcp-port3
-    nodePort: 31013
-  - protocol: TCP
-    port: 31014
-    name: tcp-port4
-    nodePort: 31014
-  - protocol: UDP
-    port: 31021
-    name: udp-port1
-    nodePort: 31021
-  - protocol: UDP
-    port: 31022
-    name: udp-port2
-    nodePort: 31022
-  - protocol: UDP
-    port: 31023
-    name: udp-port3
-    nodePort: 31023
-  - protocol: UDP
-    port: 31024
-    name: udp-port4
-    nodePort: 31024
-  # Nifi:
-  #   image: apache/nifi:2.4.0
-  #   env:
-  #     host: 0.0.0.0
-  #     user: admin
-  #     password: password123456789
-  #   HttpPort:
-  #     protocol: TCP
-  #     port: 31000
-  #     name: http-port
-  #   HttpsPort:
-  #     protocol: TCP
-  #     port: 31001
-  #     name: https-port
+  volumes:
+  - name: nifi-logs-pvc
+    mountPath: /opt/nifi/nifi-current/logs
+    accessModes: ["ReadWriteOnce"]
+    storage: 10Gi
+    persistentVolumeReclaimPolicy: Delete
+    storageClassName: local-path                  # **ONLY FOR TESTING!  NOT FOR PRODUCTION!**
+    hostPath: C:\k8\local-storage\nifi\logs   # **ONLY FOR TESTING!  NOT FOR PRODUCTION!**
+# pvc:
+#   - name: nifi-logs-pvc
+#     storage: 10Gi
+#     accessModes: ["ReadWriteOnce"]
+#   - name: nifi-content-pvc
+#     storage: 10Gi
+#     accessModes: ["ReadWriteOnce"]
+#   - name: nifi-flowfile-pvc
+#     storage: 10Gi
+#     accessModes: ["ReadWriteOnce"]
+#   - name: nifi-db-pvc
+#     storage: 10Gi
+#     accessModes: ["ReadWriteOnce"]
+#   - name: nifi-provenance-pvc
+#     storage: 10Gi
+#     accessModes: ["ReadWriteOnce"]
+service_type: NodePort
+service:
+- protocol: TCP
+  port: 31000
+  name: http-port
+  nodePort: 31000
+- protocol: TCP
+  port: 31001
+  name: https-port
+  nodePort: 31001
+- protocol: TCP
+  port: 31011
+  name: tcp-port1
+  nodePort: 31011
+- protocol: TCP
+  port: 31012
+  name: tcp-port2
+  nodePort: 31012
+- protocol: TCP
+  port: 31013
+  name: tcp-port3
+  nodePort: 31013
+- protocol: TCP
+  port: 31014
+  name: tcp-port4
+  nodePort: 31014
+- protocol: UDP
+  port: 31021
+  name: udp-port1
+  nodePort: 31021
+- protocol: UDP
+  port: 31022
+  name: udp-port2
+  nodePort: 31022
+- protocol: UDP
+  port: 31023
+  name: udp-port3
+  nodePort: 31023
+- protocol: UDP
+  port: 31024
+  name: udp-port4
+  nodePort: 31024
+# Nifi:
+#   image: apache/nifi:2.4.0
+#   env:
+#     host: 0.0.0.0
+#     user: admin
+#     password: password123456789
+#   HttpPort:
+#     protocol: TCP
+#     port: 31000
+#     name: http-port
+#   HttpsPort:
+#     protocol: TCP
+#     port: 31001
+#     name: https-port

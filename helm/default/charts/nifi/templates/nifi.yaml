@@ -1,12 +1,14 @@
-{{- $object := .Values.nifi -}}
-{{- $_ := set $object "version" .Values.version -}}
+{{- if .Values.enabled }}
+{{- $object := .Values -}}
+{{- if not $object.version -}}
+    {{- $_ := set $object "version" .Values.global.version -}}
+{{- end }}
 {{- if not $object.namespace -}}
-    {{- $_ := set $object "namespace" .Values.namespace -}}
+    {{- $_ := set $object "namespace" .Values.global.namespace -}}
 {{- end }}
 {{- /* Add Services if they are required */}}
 {{- template "mychart.service" $object }}
 
-{{- if $object.enabled }}
 ---
 #apiVersion: extensions/v1beta1
 apiVersion: networking.k8s.io/v1
@@ -120,8 +122,6 @@ spec:
   resources:
     requests:
       storage: {{ .storage }}
-{{- end }}
-
 {{- end }}
 
 {{/*
@@ -371,3 +371,4 @@ spec:
       #   persistentVolumeClaim: 
       #     claimName: {{ .Release.Name }}-nifi-provenance-pvc
 */}}
+{{- end }}

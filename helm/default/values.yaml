@@ -5,6 +5,5 @@ global:
   namespace: home-lab
   version: "0.1a"
 
-home-lab-jupyter:
-  jupyter:
-    enabled: false
+jupyter:
+  enabled: true
