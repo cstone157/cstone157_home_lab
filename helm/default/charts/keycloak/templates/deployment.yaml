@@ -1,0 +1,86 @@
+{{/*
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: keycloak
+  namespace: stone-data-lake
+  labels:
+    app: keycloak
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: keycloak
+  template:
+    metadata:
+      labels:
+        app: keycloak
+    spec:
+      containers:
+        - name: keycloak
+          image: localhost:5000/data-lake-keycloak
+          env:
+            - name: KEYCLOAK_ADMIN
+              valueFrom:
+                secretKeyRef:
+                  name: stone-data-lake-secret
+                  key: keycloak_admin_username
+            - name: KEYCLOAK_ADMIN_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: stone-data-lake-secret
+                  key: keycloak_admin_password
+
+            - name: KC_PROXY
+              value: "edge"
+            - name: KC_HEALTH_ENABLED
+              value: "true"
+            - name: KC_METRICS_ENABLED
+              value: "true"
+            - name: KC_HOSTNAME_STRICT_HTTPS
+              value: "true"
+            - name: KC_LOG_LEVEL
+              value: INFO
+            - name: KC_DB
+              value: postgres
+            - name: POSTGRES_DB
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-credentials
+                  key: POSTGRES_DB
+            - name: KC_DB_URL
+              value: jdbc:postgresql://postgres/$(POSTGRES_DB)
+            - name: KC_DB_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-credentials
+                  key: POSTGRES_USER
+            - name: KC_DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-credentials
+                  key: POSTGRES_PASSWORD
+
+          ports:
+          - name: http
+            containerPort: 8080
+          readinessProbe:
+            httpGet:
+              path: /health/ready
+              port: 8080
+            initialDelaySeconds: 250
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /health/live
+              port: 8080
+            initialDelaySeconds: 500
+            periodSeconds: 30
+          resources:
+              limits:
+                memory: 512Mi
+                cpu: "1"
+              requests:
+                memory: 256Mi
+                cpu: "0.2"
+*/}}
