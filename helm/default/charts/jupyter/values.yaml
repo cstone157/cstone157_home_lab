@@ -16,8 +16,9 @@ service:
   - protocol: TCP
     nodePort: 30020
     port: 8888
-# Jupyter:
-#   image: jupyter/minimal-notebook:notebook-7.0.6
+labels:
+  category: analysis
+
 #   name: jupyter
 #   label: jupyter
 #   selector_name: jupyter

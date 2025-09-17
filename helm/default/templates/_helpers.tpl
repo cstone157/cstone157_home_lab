@@ -9,8 +9,9 @@
     {{- range $key, $value := .labels }}
     {{ $key }}: {{ $value | toYaml | trimSuffix "\n" | indent 2 }}
     {{- end }}
-    {{- end }} # End of the mychart.labels template
-{{- end }}
+    {{- end }} 
+{{- end }}  {{/* End of mychart.labels template */}}
+
 
 
 {{/* The metadata for all of my charts */}}
@@ -19,7 +20,7 @@ metadata:
   name: {{ .name }}
   namespace: {{ default "default" .namespace }}
   {{- include "mychart.labels" $ }}
-{{- end }} # End of the mychart.metadata template
+{{- end }}  {{/* End of mychart.metadata template */}}
 
 
 {{/* Generate a service for my charts, based upon the passed object */}}
@@ -49,8 +50,7 @@ spec:
     {{- end }}
   {{- end }}
 {{- end }}
-{{- end }}
-{{- /* End of the mychart.service template */ -}}
+{{- end }} {{- /* End of the mychart.service template */ -}}
 
 
 {{- /* Generate a persistent volume's for my charts, based upon the passed object */}}
@@ -77,8 +77,7 @@ spec:
     path: {{ .hostPath }}
 {{- end }}
 {{- end }}
-{{- end }}
-{{- /* End of the mychart.persistent_volume template */ -}}
+{{- end }} {{- /* End of the mychart.persistent_volume template */ -}}
 
 
 {{/* Generate a persistent volume's for my charts, based upon the passed object */}}
@@ -106,8 +105,7 @@ spec:
       storage: {{ .storage }}
 {{- end }}
 {{- end }}
-{{- end }} 
-{{- /* End of the mychart.persistent_volume_clain template */ -}}
+{{- end }} {{- /* End of the mychart.persistent_volume_clain template */ -}}
 
 
 {{/* Generate a statefulset's for my charts, based upon the passed object */}}
@@ -161,5 +159,4 @@ spec:
       {{- end }}
       {{- end }}
 {{- end }}
-{{- end }}
-{{- /* End of the mychart.statefulset template */ -}}
+{{- end }} {{- /* End of the mychart.statefulset template */ -}}

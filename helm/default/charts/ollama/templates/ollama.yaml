@@ -1,12 +1,14 @@
-{{- $object := .Values.ollama -}}
-{{- $_ := set $object "version" .Values.version -}}
-{{- if not $object.namespace -}}
-    {{- $_ := set $object "namespace" .Values.namespace -}}
+{{- if .Values.enabled }}
+{{- $object := .Values -}}
+{{- if not $object.version -}}
+    {{- $_ := set $object "version" .Values.global.version -}}
 {{- end }}
+{{- if not $object.namespace -}}
+    {{- $_ := set $object "namespace" .Values.global.namespace -}}
+{{- end }}
+
 ## Generate the Service using the helper function to create our service
 {{- template "mychart.service" $object }}
-
-{{- if $object.enabled }}
 ---
 ## Generate the StatefulSet for the ollama pod
 apiVersion: apps/v1
@@ -88,8 +90,6 @@ spec:
 #         - name: http
 #           containerPort: 11434
 #           protocol: TCP
-{{- end }}
-
 {{/*
 apiVersion: v1
 kind: Service
@@ -149,3 +149,4 @@ spec:
         requests:
           storage: 30Gi
 */}}
+{{- end }}
