@@ -15,10 +15,3 @@ service:
     port: 8080
     targetPort: 8080
     nodePort: 30000
-# WebUi:
-#   image: ghcr.io/open-webui/open-webui:main
-#   HttpPort:
-#     protocol: TCP
-#     port: 8080
-#     targetPort: 8080
-#     nodePort: 30000

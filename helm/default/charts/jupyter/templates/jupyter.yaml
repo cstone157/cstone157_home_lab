@@ -1,7 +1,7 @@
-{{- if .Values.enabled }}
+{{- $object := .Values -}}
+{{- if $object.enabled }}
 
 {{/* Retrieve the values and if there is no version or namepsace, then use the global values */}}
-{{- $object := .Values -}}
 {{- if not $object.version -}}
     {{- $_ := set $object "version" .Values.global.version -}}
 {{- end }}

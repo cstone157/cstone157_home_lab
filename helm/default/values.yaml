@@ -7,3 +7,30 @@ global:
 
 jupyter:
   enabled: true
+
+keycloak:
+  enabled: false
+
+mongo:
+  enabled: false
+
+mongo-express:
+  enabled: false
+
+nifi:
+  enabled: false
+
+ollama:
+  enabled: false
+
+pgadmin:
+  enabled: false
+
+postgres:
+  enabled: false
+
+rstudio:
+  enabled: true
+
+webui:
+  enabled: true

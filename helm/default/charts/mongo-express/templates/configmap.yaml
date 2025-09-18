@@ -1,8 +1,9 @@
-{{/*
+{{- $object := .Values -}}
+{{- if $object.enabled }}
 apiVersion: v1
 kind: ConfigMap
 metadata:
   name: mongo-configmap
 data:
   database_url: mongo
-*/}}
+{{- end }}

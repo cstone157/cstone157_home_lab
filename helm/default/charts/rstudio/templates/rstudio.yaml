@@ -1,36 +1,53 @@
-{{/*
+{{- $object := .Values -}}
+{{- if $object.enabled }}
+
+
+
 apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: rstudio-server
+kind: StatefulSet
+{{- template "mychart.metadata" $object }}
 spec:
-  replicas: 1
+  replicas: {{ .replicaCount }}
+  serviceName: {{ $object.name }}
   selector:
     matchLabels:
-      app: rstudio
+      app: {{ $object.name }}
   template:
     metadata:
       labels:
-        app: rstudio
+        app: {{ $object.name }}
     spec:
       containers:
-        - name: rstudio
-          image: rocker/rstudio:4.2.2
-          imagePullPolicy: "IfNotPresent"
-          env:
-            - name: USERNAME
-              value: "rstudio"
-            - name: PASSWORD
-              value: "password"
+        - name: {{ $object.name }}
+          image: {{ $object.image }}
+          imagePullPolicy: {{ $object.imagePullPolicy }}
           ports:
-            - containerPort: 8787
+          {{- range .service }}
+          - containerPort: {{ .port }}
+          {{- if .name }}
+            name: {{ .name }}
+          {{- end }}
+          {{- if .protocol }}
+            protocol: {{ .protocol }}
+          {{- end }}
+          {{- end }}
+          env:
+          {{- range $object.env }}
+            - name: {{ .name }}
+              value: {{ .value | quote }}
+          {{- end }}
           volumeMounts:
-            - name: rstudio-data
-              mountPath: /home/rstudio 
+            {{- range $object.volume }}
+            - mountPath: {{ .mount_path }}
+              name: {{ .name }}
+            {{- end }}
+{{/*
       volumes:
-        - name: rstudio-data
+        {{- range $object.volume }}
+        - name: {{ .name }}
           persistentVolumeClaim:
-            claimName: rstudio-pvc
+            claimName: {{ .name }}
+        {{- end }}
 ---
 apiVersion: v1
 kind: PersistentVolume
@@ -45,16 +62,16 @@ metadata:
 #   storageClassName: local-storage 
 #   local:
 #     path: /home/cstone/rstudio-data 
-  name: {{ .Values.Lab.RStudio.name }}-local-pv
+  name: {{ $object.name }}-local-pv
 spec:
   capacity:
-    storage: {{ .Values.Lab.RStudio.volume.size }}
+    storage: {{ $object.volume.size }}
   accessModes:
     - {{ .Values.Lab.persistent_volume.access_modes }}
   persistentVolumeReclaimPolicy: {{ .Values.Lab.persistent_volume.persistent_volume_reclaim_policy }}
   storageClassName: {{ .Values.Lab.persistent_volume.storage_class_name }} 
   local:
-    path: {{ .Values.Lab.persistent_volume.volume_path }}/{{ .Values.Lab.RStudio.volume.folder_name }}
+    path: {{ .Values.Lab.persistent_volume.volume_path }}/{{ $object.volume.folder_name }}
   # nodeAffinity:
   #   required:
   #     nodeSelectorTerms:
@@ -78,13 +95,13 @@ spec:
     requests:
       storage: 10Gi 
   storageClassName: local-storage
-#   name: {{ .Values.Lab.RStudio.name }}-pvc
+#   name: {{ $object.name }}-pvc
 # spec:
 #   accessModes:
 #     - {{ .Values.Lab.persistent_volume.access_modes }}
 #   resources:
 #     requests:
-#       storage: {{ .Values.Lab.RStudio.volume.size }}  
+#       storage: {{ $object.volume.size }}  
 #   storageClassName: {{ .Values.Lab.persistent_volume.storage_class_name }} 
 #   volumeMode: Filesystem
 #   volumeName: rstudio-local-pv
@@ -101,53 +118,15 @@ spec:
   - protocol: TCP
     nodePort: 30000
     port: 8787
-#   name: {{ .Values.Lab.RStudio.name }}
+#   name: {{ $object.name }}
 # spec:
 #   type: NodePort
 #   selector:
-#     app: {{ .Values.Lab.RStudio.name }}
+#     app: {{ $object.name }}
 #   ports:
-#   - protocol: {{ .Values.Lab.RStudio.HttpPort.protocol }}
-#     nodePort: {{ .Values.Lab.RStudio.HttpPort.nodePort }}
-#     port: {{ .Values.Lab.RStudio.HttpPort.port }}
----
-apiVersion: apps/v1
-kind: StatefulSet
-metadata:
-  name: {{ .Values.Lab.RStudio.name }}
-  labels:
-    app: {{ .Values.Lab.RStudio.label }}
-spec:
-  replicas: {{ .replicaCount }}
-  serviceName: {{ .Values.Lab.RStudio.name }}
-  selector:
-    matchLabels:
-      app: {{ .Values.Lab.RStudio.name }}
-  template:
-    metadata:
-      labels:
-        app: {{ .Values.Lab.RStudio.name }}
-    spec:
-      containers:
-        - name: {{ .Values.Lab.RStudio.name }}
-          ports:
-            - containerPort: {{ .Values.Lab.RStudio.HttpPort.port  }}
-          env:
-          {{- range .Values.Lab.RStudio.env }}
-            - name: {{ .name }}
-              value: {{ .value | quote }}
-          {{- end }}
-            # - name: USERNAME
-            #   value: "rstudio"
-            # - name: PASSWORD
-            #   value: "password"
-          image: {{ .Values.Lab.RStudio.image }}
-          imagePullPolicy: "IfNotPresent"
-          volumeMounts:
-            - mountPath: {{ .Values.Lab.RStudio.volume.mount_path }}
-              name: {{ .Values.Lab.RStudio.name }}-pvc
-      volumes:
-        - name: {{ .Values.Lab.RStudio.name }}-pvc
-          persistentVolumeClaim:
-            claimName: {{ .Values.Lab.RStudio.name }}-pvc
+#   - protocol: {{ $object.HttpPort.protocol }}
+#     nodePort: {{ $object.HttpPort.nodePort }}
+#     port: {{ $object.HttpPort.port }}
 */}}
+
+{{- end }}

@@ -1,5 +1,5 @@
-{{- if .Values.postgres }}
-{{- $object := .Values.postgres -}}
+{{- $object := .Values -}}
+{{- if $object.enabled }}
 {{- $_ := set $object "version" .Values.version -}}
 {{- if not $object.namespace -}}
     {{- $_ := set $object "namespace" .Values.namespace -}}
@@ -99,7 +99,7 @@ spec:
   #         requests:
   #           storage: {{ $object.storage.size | quote }}
 */}}
-{{- end }}
+
 
 {{/*
 apiVersion: v1
@@ -203,3 +203,4 @@ spec:
     port: 5432
     targetPort: 5432
 */}}
+{{- end }}

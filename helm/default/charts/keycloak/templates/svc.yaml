@@ -1,4 +1,5 @@
-{{/*
+{{- $object := .Values -}}
+{{- if $object.enabled }}
 apiVersion: v1
 kind: Service
 metadata:
@@ -14,4 +15,4 @@ spec:
   selector:
     app: keycloak
   type: LoadBalancer
-*/}}
+{{- end }}

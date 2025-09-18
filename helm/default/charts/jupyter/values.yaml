@@ -19,7 +19,7 @@ service:
 labels:
   category: analysis
 persistentVolume:
-  enabled: FALSE
+  enabled: false
   volumes:
   - name: jupyter-local
     mountPath: /home/jovyan/work

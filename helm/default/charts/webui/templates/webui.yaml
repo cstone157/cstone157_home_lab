@@ -1,5 +1,5 @@
-{{- if .Values.enabled }}
 {{- $object := .Values -}}
+{{- if $object.enabled }}
 {{- if not $object.version -}}
     {{- $_ := set $object "version" .Values.global.version -}}
 {{- end }}
@@ -10,13 +10,14 @@
 ## Generate the Service using the helper function to create our service
 {{- template "mychart.service" $object }}
 
+{{/*
 ---
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 {{- template "mychart.metadata" $object }}
 spec:
   rules:
-  - host: localhost
+  - host: localhost # open-webui.minikube.local
     http:
       paths:
       - path: /webui
@@ -26,10 +27,10 @@ spec:
             name: {{ $object.name }}
             port:
               number: 30000
+*/}}
 ---
 apiVersion: apps/v1
 kind: Deployment
-metadata:
 {{- template "mychart.metadata" $object }}
 spec:
   replicas: {{ $object.replicas }}
@@ -45,7 +46,16 @@ spec:
       - name: {{ $object.name }}
         image: {{ $object.image }}
         ports:
-        - containerPort: 8080
+        ports:
+        {{- range .service }}
+        - containerPort: {{ .port }}
+        {{- if .name }}
+          name: {{ .name }}
+        {{- end }}
+        {{- if .protocol }}
+          protocol: {{ .protocol }}
+        {{- end }}
+        {{- end }}
         resources:
           requests:
             cpu: "500m"
@@ -63,7 +73,8 @@ spec:
     #  volumes:
     #  - name: webui-volume
     #    persistentVolumeClaim:
-    #      claimName: open-webui-pvc
+    #      claimName: open-webui-pvc  
+{{/*
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
@@ -73,88 +84,5 @@ spec:
   resources:
     requests:
       storage: 2Gi
-
-{{/*
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: {{ .Release.Name }}-openwebui
-spec:
-  selector:
-    matchLabels:
-      app: open-webui
-  replicas: {{ .replicaCount }}
-  template:
-    metadata:
-      labels:
-        app: open-webui
-    spec:
-      containers:
-      - name: open-webui
-        image: {{ .Values.Lab.WebUi.image }}
-        imagePullPolicy: IfNotPresent
-        ports:
-        - containerPort: {{ .Values.Lab.WebUi.HttpPort.port }}
-        resources:
-          requests:
-            cpu: "500m"
-            memory: "500Mi"
-          limits:
-            cpu: "1000m"
-            memory: "1Gi"
-        env:
-        - name: OLLAMA_BASE_URL
-          value: "http://ollama-service.open-webui.svc.cluster.local:11434"
-        tty: true
-        volumeMounts:
-        - name: webui-volume
-          mountPath: /app/backend/data
-      volumes:
-      - name: webui-volume
-        persistentVolumeClaim:
-          claimName: open-webui-pvc          
----
-apiVersion: networking.k8s.io/v1
-kind: Ingress
-metadata:
-  name: open-webui-ingress
-spec:
-  rules:
-  - host: open-webui.minikube.local
-    http:
-      paths:
-      - path: /webui
-        pathType: Prefix
-        backend:
-          service:
-            name: open-webui-service
-            port:
-              number: 30000
----
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  labels:
-    app: open-webui
-  name: open-webui-pvc
-spec:
-  accessModes: ["ReadWriteOnce"]
-  resources:
-    requests:
-      storage: 2Gi
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: {{ .Release.Name }}-openwebui
-spec:
-  type: NodePort  # Use LoadBalancer if you're on a cloud that supports it
-  selector:
-    app: open-webui
-  ports:
-    - protocol: {{ .Values.Lab.WebUi.HttpPort.protocol }}
-      port: {{ .Values.Lab.WebUi.HttpPort.port }}
-      targetPort: {{ .Values.Lab.WebUi.HttpPort.targetPort }}
-      nodePort: {{ .Values.Lab.WebUi.HttpPort.nodePort }}
 */}}
 {{- end }}

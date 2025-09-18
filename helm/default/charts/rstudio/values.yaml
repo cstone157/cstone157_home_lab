@@ -1,29 +1,22 @@
 # ------------------------------------------------------------------------------
 # RStudio :
 # ------------------------------------------------------------------------------
-rstudio:
-  enabled: false
-  serviceName: rstudio
-  name: rstudio
-  image: rocker/rstudio:4.2.2
-  imagePullPolicy: IfNotPresent
-  replicas: 1
-  # RStudio:
-  #   image: rocker/rstudio:4.2.2
-  #   name: rstudio
-  #   label: rstudio
-  #   selector_name: rstudio
-  #   env:
-  #     - name: USERNAME
-  #       value: "rstudio"
-  #     - name: PASSWORD
-  #       value: "password"
-  #   volume:
-  #     folder_name: rstudio-data
-  #     mount_path: /home/rstudio 
-  #     size: 10Gi
-  #   HttpPort:
-  #     name: rstudio-http
-  #     protocol: TCP
-  #     nodePort: 30000
-  #     port: 8787
+enabled: false
+serviceName: rstudio
+name: rstudio
+image: rocker/rstudio:4.2.2
+imagePullPolicy: IfNotPresent
+replicas: 1
+env:
+- name: USERNAME
+  value: "rstudio"
+- name: PASSWORD
+  value: "password"
+service:
+  - protocol: TCP
+    nodePort: 30000
+    port: 8787
+volume:
+  folder_name: rstudio-data
+  mount_path: /home/rstudio 
+  size: 10Gi

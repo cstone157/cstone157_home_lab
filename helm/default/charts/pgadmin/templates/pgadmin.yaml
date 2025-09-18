@@ -1,5 +1,6 @@
 
-{{/*
+{{- $object := .Values -}}
+{{- if $object.enabled }}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -105,4 +106,4 @@ spec:
                   key: pgadmin_root_password
             - name: PGADMIN_CONFIG_SERVER_MODE
               value: "True"
-*/}}
+{{- end }}
