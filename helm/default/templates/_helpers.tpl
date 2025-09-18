@@ -143,6 +143,15 @@ spec:
         {{- if .name }}
           name: {{ .name }}
         {{- end }}
+        {{- if .protocol }}
+          protocol: {{ .protocol }}
+        {{- end }}
+        {{- end }}
+        {{- if .command }}
+        command: {{ .command }}
+        {{- end }}
+        {{- if .args }}
+        args: {{ .args }}
         {{- end }}
       {{- /* Add volumemounts/volumes if they are required */ -}}
       {{- if .persistentVolume }}

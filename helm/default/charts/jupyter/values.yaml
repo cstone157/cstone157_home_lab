@@ -18,17 +18,20 @@ service:
     port: 8888
 labels:
   category: analysis
-
-#   name: jupyter
-#   label: jupyter
-#   selector_name: jupyter
-#   volume:
-#     # name: jupyter-local-pv # DELTE ME, unecissary
-#     folder_name: jupyter-data
-#     mount_path: /home/jovyan/work
-#     size: 10Gi
-#   HttpPort:
-#     name: jupyter-http
-#     protocol: TCP
-#     nodePort: 30020
-#     port: 8888
+persistentVolume:
+  enabled: FALSE
+  volumes:
+  - name: jupyter-local
+    mountPath: /home/jovyan/work
+    accessModes: ["ReadWriteOnce"]
+    storage: 5Gi
+    persistentVolumeReclaimPolicy: Delete
+    storageClassName: local-path                  # **ONLY FOR TESTING!  NOT FOR PRODUCTION!**
+    hostPath: C:\k8\local-storage\jupyter         # **ONLY FOR TESTING!  NOT FOR PRODUCTION!**
+# volume:
+#   # name: jupyter-local-pv # DELTE ME, unecissary
+#   folder_name: jupyter-data
+#   mount_path: /home/jovyan/work
+#   size: 10Gi
+# command: ["start-notebook.sh"]
+# args: ["--NotebookApp.token=''"]
