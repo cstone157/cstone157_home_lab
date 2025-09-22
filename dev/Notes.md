@@ -4,7 +4,6 @@
 
 - Install Rancher Desktop (RKE) (https://docs.rancherdesktop.io/getting-started/installation/)
 - Install Helm
-- 
 
 ## 2.) Setup Development Enviroment
 
@@ -16,7 +15,7 @@
         - For simplicity, the cert-manager Helm charts are published to the same OCI registry as the cert-manager container images, at quay.io/jetstack
         - <code>$ helm install cert-manager oci://quay.io/jetstack/charts/cert-manager --version v1.18.2 --namespace cert-manager --create-namespace --set crds.enabled=true</code>
 
-- Test cert-manager / use it to setup an ingress controller
+- Test cert-manager for self-signed certificate / use it to setup an ingress controller (Example)
     - Create the namespace:
         - <code>$ kubectl create namespace test</code>
     - Create the issuer:
@@ -41,13 +40,16 @@
         - <code>$ echo -e 'GET /test.txt HTTP/1.1\r\n\r\n' | openssl s_client -cert <(kubectl -n test get secret test-client-tls -o jsonpath='{.data.tls\.crt}' | base64 -d) -key <(kubectl -n test get secret test-client-tls -o jsonpath='{.data.tls\.key}' | base64 -d) -CAfile <(kubectl -n test get secret test-client-tls -o jsonpath='{.data.ca\.crt}' | base64 -d) -connect localhost:12345 -quiet</code>
     - Echo Server Setup with CA Signed Certificate:
         - Let’s try our setup with a simple echo server using Ingress. When using minikube be sure to enable ingress:
-        - <code>$ kubectl create -f cert-manager/echo-server.yaml</code>
+        - <code>$ kubectl create -f cert-manager/05-echo-server.yaml</code>
     - Edit the hosts file to include:
         - <code>127.0.0.1    echo.info</code>
         - The location of the hosts file varies by operating system:
             - Windows: C:\Windows\System32\drivers\etc\hosts
             - /etc/hosts
-    - Enable network tunneling
+    - Enable network tunneling (if necissary)
+        - 
+    - Test the connection
+        - <code>$ curl --cacert <(kubectl -n test get secret echo-server-cert -o jsonpath='{.data.ca\.crt}' | base64 -d) https://echo.info/test</code>
 
 
 

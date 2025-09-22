@@ -16,7 +16,7 @@ service:
   - protocol: TCP
     nodePort: 30000
     port: 8787
-volume:
+volumes:
   folder_name: rstudio-data
   mount_path: /home/rstudio 
   size: 10Gi

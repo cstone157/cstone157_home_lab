@@ -1,10 +1,12 @@
 apiVersion: cert-manager.io/v1
 kind: Certificate
 metadata:
+  name: {{ .Chart.Name }}-ingress
+  namespace: {{ .Chart.Name }}
   labels:
-    app: image-repository
-  name: image-repository-ingress
-  namespace: lab-test
+    date: {{ now | htmlDate }}
+    version: {{ .Chart.Version | quote }}
+    app: {{ .Chart.Name }}
 spec:
   dnsNames:
   - registry.tmdash2.lab.shocn.lan
@@ -13,7 +15,7 @@ spec:
     kind: ClusterAdcsIssuer
     name: adcs-cluster-issuer
   renewBefore: 48h0m0s
-  secretName: image-repository-tls-ingress
+  secretName: {{ .Chart.Name }}-tls-ingress
   usages:
   - digital signature
   - key encipherment

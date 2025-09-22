@@ -1,11 +1,16 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: image-repository
+  name: {{ .Chart.Name }}
+  namespace: {{ .Chart.Name }}
+  labels:
+    app: {{ .Chart.Name }}
+    date: {{ now | htmlDate }}
+    version: {{ .Chart.Version | quote }}
 spec:
   type: ClusterIP  # Or LoadBalancer for external access
   selector:
-    app: image-repository
+    app: {{ .Chart.Name }}
   ports:
   - protocol: TCP
     port: 5000     # Expose on HTTPS port externally
