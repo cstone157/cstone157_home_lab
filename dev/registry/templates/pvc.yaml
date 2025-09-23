@@ -1,3 +1,4 @@
+{{/*
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
@@ -14,3 +15,4 @@ spec:
     requests:
       storage: 10Gi #  Adjust the storage size as needed
   # storageClassName: standard # Or your preferred storage class
+*/}}

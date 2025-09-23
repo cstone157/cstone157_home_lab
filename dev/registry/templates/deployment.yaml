@@ -1,3 +1,4 @@
+{{/*
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -46,3 +47,4 @@ spec:
         secret:
           secretName: registry-tls # Replace with the name of your secret containing TLS certificates
           defaultMode: 0400        # Ensure appropriate permissions
+*/}}
