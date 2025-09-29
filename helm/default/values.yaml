@@ -6,7 +6,7 @@ global:
   version: "0.1a"
 
 jupyter:
-  enabled: true
+  enabled: false
 
 keycloak:
   enabled: false
@@ -18,7 +18,7 @@ mongo-express:
   enabled: false
 
 nifi:
-  enabled: false
+  enabled: true
 
 ollama:
   enabled: false
@@ -30,7 +30,7 @@ postgres:
   enabled: false
 
 rstudio:
-  enabled: true
+  enabled: false
 
 webui:
-  enabled: true
+  enabled: false
