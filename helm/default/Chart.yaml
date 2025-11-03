@@ -1,5 +1,5 @@
 apiVersion: v2
-name: test-lab
+name: home-lab
 description: A helm chart to deploy a basic lab that I use for testing data-science
 type: application
 version: 0.1.0

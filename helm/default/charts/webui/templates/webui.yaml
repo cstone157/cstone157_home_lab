@@ -1,0 +1,88 @@
+{{- $object := .Values -}}
+{{- if $object.enabled }}
+{{- if not $object.version -}}
+    {{- $_ := set $object "version" .Values.global.version -}}
+{{- end }}
+{{- if not $object.namespace -}}
+    {{- $_ := set $object "namespace" .Values.global.namespace -}}
+{{- end }}
+
+## Generate the Service using the helper function to create our service
+{{- template "mychart.service" $object }}
+
+{{/*
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+{{- template "mychart.metadata" $object }}
+spec:
+  rules:
+  - host: localhost # open-webui.minikube.local
+    http:
+      paths:
+      - path: /webui
+        pathType: Prefix
+        backend:
+          service:
+            name: {{ $object.name }}
+            port:
+              number: 30000
+*/}}
+---
+apiVersion: apps/v1
+kind: Deployment
+{{- template "mychart.metadata" $object }}
+spec:
+  replicas: {{ $object.replicas }}
+  selector:
+    matchLabels:
+      app: {{ $object.name }}
+  template:
+    metadata:
+      labels:
+        app: {{ $object.name }}
+    spec:
+      containers:
+      - name: {{ $object.name }}
+        image: {{ $object.image }}
+        ports:
+        ports:
+        {{- range .service }}
+        - containerPort: {{ .port }}
+        {{- if .name }}
+          name: {{ .name }}
+        {{- end }}
+        {{- if .protocol }}
+          protocol: {{ .protocol }}
+        {{- end }}
+        {{- end }}
+        resources:
+          requests:
+            cpu: "500m"
+            memory: "500Mi"
+          limits:
+            cpu: "1000m"
+            memory: "1Gi"
+    #     env:
+    #     - name: OLLAMA_BASE_URL
+    #       value: "http://ollama-service.open-webui.svc.cluster.local:11434"
+    #     tty: true
+    #    volumeMounts:
+    #    - name: webui-volume
+    #      mountPath: /app/backend/data
+    #  volumes:
+    #  - name: webui-volume
+    #    persistentVolumeClaim:
+    #      claimName: open-webui-pvc  
+{{/*
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+{{- template "mychart.metadata" $object }}
+spec:
+  accessModes: ["ReadWriteOnce"]
+  resources:
+    requests:
+      storage: 2Gi
+*/}}
+{{- end }}

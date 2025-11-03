@@ -1,0 +1,206 @@
+{{- $object := .Values -}}
+{{- if $object.enabled }}
+{{- $_ := set $object "version" .Values.version -}}
+{{- if not $object.namespace -}}
+    {{- $_ := set $object "namespace" .Values.namespace -}}
+{{- end }}
+
+{{/* Add Service if they are required */}} 
+{{- template "mychart.service" $object }}
+
+{{/* Add Statefulset if they are required */}}
+{{- template "mychart.statefulset" $object }}
+
+{{/* Add PersistentVolumeClaims if they are required */}}
+{{- template "mychart.persistent_volume_claim" $object }}
+
+{{/* Add PersistentVolumes if they are required */}}
+{{- template "mychart.persistent_volume" $object }}
+ 
+{{/*---
+apiVersion: v1
+kind: Service
+{{- template "mychart.metadata" $object }}
+spec:
+  selector:
+    app: {{ coalesce $object.labels.app .name "unknown" }}
+  ports:
+  {{- range .service }}
+  - protocol: {{ .protocol }}
+    {{- if .nodePort }}
+    nodePort: {{ .nodePort }}
+    {{- end }}
+    {{- if .port }}
+    port: {{ .port }}
+    {{- end }}
+    {{- if .name }}
+    name: {{ .name }}
+    {{- end }}
+    {{- if .targetPort }}
+    targetPort: {{ .targetPort }}
+    {{- end }}
+  {{- end }}
+  type: ClusterIP
+
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+{{- template "mychart.metadata" $object }}
+spec:
+  replicas: {{ $object.replicas }}
+  selector:
+    matchLabels:
+      app: postgres
+      release: postgres
+  serviceName: postgres
+  template:
+    metadata:
+      labels: 
+        app: postgres
+        release: {{ .Release.Name }}
+    spec:
+      securityContext:
+        {{- toYaml $object.securityContext | nindent 8 }}
+      containers:
+      - name: postgres
+        image: {{ $object.image }}
+        imagePullPolicy: {{ $object.imagePullPolicy |  default "IfNotPresent" }}
+        resources:
+          {{- toYaml $object.resources | nindent 12 }}        
+        ports:
+        {{- range .service }}
+        - containerPort: {{ .port }}
+        {{- if .name }}
+          name: {{ .name }}
+        {{- end }}
+        {{- end }}
+        env:
+        - name: POSTGRES_USER
+          value: {{ default "postgres" $object.postgresUser | quote }}
+        - name: POSTGRES_PASSWORD
+          value: "password"
+          # valueFrom:
+          #   secretKeyRef:
+          #     name: {{ $object.postgresPassword.name }}
+          #     key: {{ $object.postgresPassword.passwordKey }}
+        - name: POSTGRES_DB
+          value: {{ quote $object.postgresDB }}
+  #         volumeMounts:
+  #           - name: postgresql-data
+  #             mountPath: /var/lib/postgresql/data
+  # volumeClaimTemplates:
+  #   - metadata:
+  #       name: postgresql-data
+  #     spec:
+  #       accessModes: [ "ReadWriteOnce" ]
+  #       storageClassName: {{ $object.storage.storageClassName | quote }}
+  #       resources:
+  #         requests:
+  #           storage: {{ $object.storage.size | quote }}
+*/}}
+
+
+{{/*
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: postgres-pv
+  namespace: stone-data-lake
+spec:
+  capacity:
+    storage: 20Gi
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: local-storage
+  local:
+#    path: /run/desktop/mnt/host/c/Users/c.stone/Documents/GitHub/data_lake_example/postgres/data # Hard coded
+#    path: # This doesn't work
+#      valueFrom:  
+#        configMapKeyRef:
+#          name: stone-data-lake-configmap
+#          key: postgres-db-location
+    path: ${postgres_local_path}
+  nodeAffinity:
+    required:
+      nodeSelectorTerms:
+        - matchExpressions:
+            - key: kubernetes.io/hostname
+              operator: In
+              values:
+                - docker-desktop
+  volumeMode: Filesystem 
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: postgres-pvc
+  namespace: stone-data-lake
+spec:
+  storageClassName: local-storage
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 10Gi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: postgres
+  namespace: stone-data-lake
+spec:
+  selector:
+   matchLabels:
+    app: postgres
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: postgres
+    spec:
+      containers:
+        - name: postgres
+#          image: postgres:14.5
+          image: localhost:5000/data-lake-postgres
+          imagePullPolicy: "IfNotPresent"
+          env:
+           - name: POSTGRES_USER
+             valueFrom:
+               secretKeyRef:
+                 name: stone-data-lake-secret
+                 key: postgres_root_username
+           - name: POSTGRES_PASSWORD
+             valueFrom:
+               secretKeyRef:
+                 name: stone-data-lake-secret
+                 key: postgres_root_password
+           - name: POSTGRES_DB
+             valueFrom:
+               configMapKeyRef:
+                 name: stone-data-lake-configmap
+                 key: postgres-dbname
+          volumeMounts:
+            - mountPath: /var/lib/postgresql/data
+              name: postgredb
+      volumes:
+        - name: postgredb
+          persistentVolumeClaim:
+            claimName: postgres-pvc
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgres
+  namespace: stone-data-lake
+spec:
+  type: ClusterIP
+  selector:
+    app: postgres
+  ports:
+  - name: postgres-port
+    port: 5432
+    targetPort: 5432
+*/}}
+{{- end }}

@@ -1,0 +1,37 @@
+# ------------------------------------------------------------------------------
+# JupyterLab :
+# ------------------------------------------------------------------------------
+enabled: true
+name: jupyter
+image: jupyter/minimal-notebook:notebook-7.0.6  # jupyter/minimal-notebook:x86_64-python-3.11.6 # jupyter/datascience-notebook:x86_64-ubuntu-22.04
+imagePullPolicy: IfNotPresent
+replicas: 1
+env:
+  - name: JUPYTER_PORT  
+    value: "8888"
+  - name: RESTARTABLE
+    value: "yes"
+service_type: NodePort
+service:
+  - protocol: TCP
+    nodePort: 30020
+    port: 8888
+labels:
+  category: analysis
+persistentVolume:
+  enabled: false
+  volumes:
+  - name: jupyter-local
+    mountPath: /home/jovyan/work
+    accessModes: ["ReadWriteOnce"]
+    storage: 5Gi
+    persistentVolumeReclaimPolicy: Delete
+    storageClassName: local-path                  # **ONLY FOR TESTING!  NOT FOR PRODUCTION!**
+    hostPath: C:\k8\local-storage\jupyter         # **ONLY FOR TESTING!  NOT FOR PRODUCTION!**
+# volume:
+#   # name: jupyter-local-pv # DELTE ME, unecissary
+#   folder_name: jupyter-data
+#   mount_path: /home/jovyan/work
+#   size: 10Gi
+# command: ["start-notebook.sh"]
+# args: ["--NotebookApp.token=''"]

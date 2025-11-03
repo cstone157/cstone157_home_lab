@@ -1,0 +1,22 @@
+{{- $object := .Values -}}
+{{- if $object.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: mongo-express
+spec:
+  selector:
+    app: mongo-express
+#  type: LoadBalancer
+  type: NodePort
+  ports:
+  - protocol: TCP
+    nodePort: 30000
+    port: 8081
+#   - port: 8081
+#     nodePort: 30000
+#   - protocol: TCP
+#     port: 8081
+#      targetPort: 8081
+#     nodePort: 30000
+{{- end }}

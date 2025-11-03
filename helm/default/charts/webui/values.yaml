@@ -1,0 +1,17 @@
+# ------------------------------------------------------------------------------
+# Webui :
+# ------------------------------------------------------------------------------
+enabled: false
+name: open-webui
+image: dyrnq/open-webui:v0.3.16-ollama # ghcr.io/open-webui/open-webui:main
+imagePullPolicy: IfNotPresent
+replicas: 1
+env:
+  - name: OLLAMA_BASE_URL
+    value: "http://ollama-service.open-webui.svc.cluster.local:11434"
+service_type: NodePort
+service:
+  - protocol: TCP
+    port: 8080
+    targetPort: 8080
+    nodePort: 30000

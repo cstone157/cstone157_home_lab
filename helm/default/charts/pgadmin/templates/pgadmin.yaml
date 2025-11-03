@@ -1,0 +1,109 @@
+
+{{- $object := .Values -}}
+{{- if $object.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}-pgadmin
+spec:
+  selector:
+    matchLabels:
+      app: pgadmin
+  replicas: {{ .replicaCount }}
+  template:
+    metadata:
+      labels:
+        app: pgadmin
+    spec:
+      containers:
+      - name: pgadmin
+        image: {{ .Values.Lab.PgAdmin.image }}
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: {{ .Values.Lab.PgAdmin.HttpPort.port }}
+        env:
+        - name: PGADMIN_DEFAULT_EMAIL
+          value:  {{ quote .Values.Lab.PgAdmin.env.email }}
+        - name: PGADMIN_DEFAULT_PASSWORD
+          value: {{ quote .Values.Lab.PgAdmin.env.password }}
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: pgadmin-ingress
+spec:
+  rules:
+  - host: open-webui.minikube.local
+    http:
+      paths:
+      - path: /pgadmin
+        pathType: Prefix
+        backend:
+          service:
+            name: open-webui-service
+            port:
+              number: 30010
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Release.Name }}-pgadmin
+spec:
+  selector:
+    app: pgadmin
+  ports:
+  - name: {{ .Values.Lab.PgAdmin.HttpPort.name }}
+    port: {{ .Values.Lab.PgAdmin.HttpPort.port }}
+    targetPort: {{ .Values.Lab.PgAdmin.HttpPort.targetPort }}
+    nodePort: {{ .Values.Lab.PgAdmin.HttpPort.nodePort }}
+  type: NodePort
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: pgadmin-service
+  namespace: stone-data-lake
+  labels:
+    app: pgadmin
+spec:
+  selector:
+   app: pgadmin
+  type: NodePort
+  ports:
+  - protocol: TCP
+    nodePort: 30200
+    port: 80
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: pgadmin
+  namespace: stone-data-lake
+spec:
+  selector:
+   matchLabels:
+    app: pgadmin
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: pgadmin
+    spec:
+      containers:
+        - name: pgadmin4
+#          image: dpage/pgadmin4:8.11
+          image: localhost:5000/data-lake-pgadmin
+          env:
+            - name: PGADMIN_DEFAULT_EMAIL
+              valueFrom:
+                secretKeyRef:
+                  name: stone-data-lake-secret
+                  key: pgadmin_root_username
+            - name: PGADMIN_DEFAULT_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: stone-data-lake-secret
+                  key: pgadmin_root_password
+            - name: PGADMIN_CONFIG_SERVER_MODE
+              value: "True"
+{{- end }}

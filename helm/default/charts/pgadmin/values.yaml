@@ -1,0 +1,31 @@
+# ------------------------------------------------------------------------------
+# PgAdmin :
+# ------------------------------------------------------------------------------
+pgadmin:
+  enabled: false
+  serviceName: pgadmin
+  name: pgadmin
+  image: dpage/pgadmin4:7.8
+  imagePullPolicy: IfNotPresent
+  replicas: 1
+  env:
+    - name: PGADMIN_DEFAULT_EMAIL
+      value: "admin@email.com"
+    - name: PGADMIN_DEFAULT_PASSWORD
+      value: "admin"
+  service_type: NodePort
+  service:
+    - protocol: TCP
+      port: 80
+      targetPort: 80
+      nodePort: 30010
+  # PgAdmin:
+  #   image: dpage/pgadmin4:7.8
+  #   HttpPort:
+  #     name: pgadmin-port
+  #     port: 80
+  #     targetPort: 80
+  #     nodePort: 30010
+  #   env:
+  #     email: admin@email.com
+  #     password: admin

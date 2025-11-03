@@ -1,0 +1,132 @@
+{{- $object := .Values -}}
+{{- if $object.enabled }}
+
+
+
+apiVersion: apps/v1
+kind: StatefulSet
+{{- template "mychart.metadata" $object }}
+spec:
+  replicas: {{ .replicaCount }}
+  serviceName: {{ $object.name }}
+  selector:
+    matchLabels:
+      app: {{ $object.name }}
+  template:
+    metadata:
+      labels:
+        app: {{ $object.name }}
+    spec:
+      containers:
+        - name: {{ $object.name }}
+          image: {{ $object.image }}
+          imagePullPolicy: {{ $object.imagePullPolicy }}
+          ports:
+          {{- range .service }}
+          - containerPort: {{ .port }}
+          {{- if .name }}
+            name: {{ .name }}
+          {{- end }}
+          {{- if .protocol }}
+            protocol: {{ .protocol }}
+          {{- end }}
+          {{- end }}
+          env:
+          {{- range $object.env }}
+            - name: {{ .name }}
+              value: {{ .value | quote }}
+          {{- end }}
+          volumeMounts:
+            {{- range $object.volume }}
+            - mountPath: {{ .mount_path }}
+              name: {{ .name }}
+            {{- end }}
+{{/*
+      volumes:
+        {{- range $object.volume }}
+        - name: {{ .name }}
+          persistentVolumeClaim:
+            claimName: {{ .name }}
+        {{- end }}
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+#   name: rstudio-local-pv
+# spec:
+#   capacity:
+#     storage: 10Gi
+#   accessModes:
+#     - ReadWriteOnce
+#   persistentVolumeReclaimPolicy: Retain
+#   storageClassName: local-storage 
+#   local:
+#     path: /home/cstone/rstudio-data 
+  name: {{ $object.name }}-local-pv
+spec:
+  capacity:
+    storage: {{ $object.volume.size }}
+  accessModes:
+    - {{ .Values.Lab.persistent_volume.access_modes }}
+  persistentVolumeReclaimPolicy: {{ .Values.Lab.persistent_volume.persistent_volume_reclaim_policy }}
+  storageClassName: {{ .Values.Lab.persistent_volume.storage_class_name }} 
+  local:
+    path: {{ .Values.Lab.persistent_volume.volume_path }}/{{ $object.volume.folder_name }}
+  # nodeAffinity:
+  #   required:
+  #     nodeSelectorTerms:
+  #       - matchExpressions:
+  #           - key: kubernetes.io/hostname
+  #             operator: In
+  #             values:
+  #               - lima-rancher-desktop
+  # nodeSelector:
+  #   matchLabels:
+  #     kubernetes.io/hostname: lima-rancher-desktop 
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: rstudio-pvc
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 10Gi 
+  storageClassName: local-storage
+#   name: {{ $object.name }}-pvc
+# spec:
+#   accessModes:
+#     - {{ .Values.Lab.persistent_volume.access_modes }}
+#   resources:
+#     requests:
+#       storage: {{ $object.volume.size }}  
+#   storageClassName: {{ .Values.Lab.persistent_volume.storage_class_name }} 
+#   volumeMode: Filesystem
+#   volumeName: rstudio-local-pv
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: rstudio-server
+spec:
+  type: NodePort
+  selector:
+    app: rstudio
+  ports:
+  - protocol: TCP
+    nodePort: 30000
+    port: 8787
+#   name: {{ $object.name }}
+# spec:
+#   type: NodePort
+#   selector:
+#     app: {{ $object.name }}
+#   ports:
+#   - protocol: {{ $object.HttpPort.protocol }}
+#     nodePort: {{ $object.HttpPort.nodePort }}
+#     port: {{ $object.HttpPort.port }}
+*/}}
+
+{{- end }}
