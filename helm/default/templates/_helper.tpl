@@ -17,8 +17,7 @@
 {{- define "mychart.metadata" }}
 metadata:
   name: {{ .name }}
-  #namespace: {{ default "default" .namespace }}
-  namespace: {{ default .Release.Namespace .namespace }}
+  namespace: {{ default "default" .namespace }}
   {{- include "mychart.labels" $ }}
 {{- end }} # End of the mychart.metadata template
 
