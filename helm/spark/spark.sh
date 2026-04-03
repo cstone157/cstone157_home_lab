@@ -18,6 +18,13 @@
 
 
 ## ========================================
+## Build the Spark Runner Docker image
+## ========================================
+nerdctl build -t spark-runner:latest -f spark-runner/Dockerfile -namespace=k8s.io ./spark-runner/
+
+## ========================================
+## Deploy the Spark/JupyterLab application
+## ========================================
 ## Apply the RBAC configuration for Spark
 kubectl apply -f spark-rbac.yaml
 
