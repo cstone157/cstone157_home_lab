@@ -53,7 +53,6 @@ pod_ip = os.environ.get("POD_IP")
 spark = SparkSession.builder \
     .appName("Jupyter-Spark-K8s") \
     .master("k8s://https://kubernetes.default.svc.cluster.local:443") \
-    # .config("spark.kubernetes.container.image", "apache/spark-py:v3.3.1") \
     .config("spark.kubernetes.container.image", "spark-runner:latest") \
     .config("spark.kubernetes.authenticate.driver.serviceAccountName", "spark-jupyter-sa") \
     .config("spark.kubernetes.namespace", "default") \

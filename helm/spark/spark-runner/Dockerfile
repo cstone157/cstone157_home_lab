@@ -3,20 +3,19 @@ FROM apache/spark-py:v3.3.1
 ## Switch to root user to install Python 3.10
 USER root
 
-# RUN apt-get update -y
-# RUN apt-get install python3.10 -y
-# RUN apt-get clean -y
 RUN apt-get update 
-RUN apt-get install software-properties-common -y
-RUN add-apt-repository ppa:deadsnakes/ppa -y
-RUN apt-get update 
-RUN apt-get install -y python3.10 python3.10-venv python3.10-dev curl
+RUN apt install build-essential zlib1g-dev libncurses5-dev libgdbm-dev libnss3-dev libssl-dev libreadline-dev libffi-dev libsqlite3-dev wget libbz2-dev -y
+RUN wget https://python.org/ftp/python/3.10.14/Python-3.10.14.tgz
+RUN tar -xf Python-3.10.14.tgz
+# RUN cd Python-3.10.14
+WORKDIR /opt/spark/work-dir/Python-3.10.14
+RUN ./configure --enable-optimizations
+RUN make -j $(nproc)
+# RUN make altinstall
+RUN make install
+# RUN cd ..
 
-# Update symlink to make python3 point to 3.10
-RUN ln -sf /usr/bin/python3.10 /usr/bin/python3
-
-# Install pip for the new version
-RUN curl -sS https://bootstrap.pypa.io/get-pip.py | python3.10
 
 ## Switch back to the non-root user
+WORKDIR /opt/spark/work-dir/
 USER 185
