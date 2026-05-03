@@ -30,7 +30,7 @@ postgres:
   enabled: false
 
 rstudio:
-  enabled: true
+  enabled: false
 
 webui:
-  enabled: true
+  enabled: false

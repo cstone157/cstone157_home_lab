@@ -1,18 +1,22 @@
+{{/*
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: image-repository
+  name: {{ .Chart.Name }}
+  namespace: {{ .Chart.Name }}
   labels:
-    app: image-repository
+    date: {{ now | htmlDate }}
+    version: {{ .Chart.Version | quote }}
+    app: {{ .Chart.Name }}
 spec:
   replicas: 1  # Adjust as needed for desired availability
   selector:
     matchLabels:
-      app: image-repository
+      app: {{ .Chart.Name }}
   template:
     metadata:
       labels:
-        app: image-repository
+        app: {{ .Chart.Name }}
     spec:
       containers:
       - name: registry
@@ -35,13 +39,12 @@ spec:
           value: /certs/tls.crt  # Path to your TLS certificate
         - name: REGISTRY_HTTP_TLS_KEY
           value: /certs/tls.key  # Path to your TLS key
-
       volumes:
       - name: registry-data
         persistentVolumeClaim:
-          claimName: registry-pvc  # Replace with your PVC name or define an inline volume
-
+          claimName: {{ .Chart.Name }}-pvc  # Replace with your PVC name or define an inline volume
       - name: registry-certs
         secret:
           secretName: registry-tls # Replace with the name of your secret containing TLS certificates
           defaultMode: 0400        # Ensure appropriate permissions
+*/}}

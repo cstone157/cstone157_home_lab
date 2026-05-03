@@ -16,7 +16,7 @@ kind: Ingress
 {{- template "mychart.metadata" $object }}
 spec:
   rules:
-  - host: nifi
+  - host: home.lab.lan
     http:
       paths:
       - path: /nifi
@@ -25,7 +25,11 @@ spec:
           service:
             name: nifi-service
             port:
-              number: 8180
+              number: 31001
+  tls:
+    - hosts:
+        - home.lab.lan  # Replace with your hostname/FQDN
+      secretName: nifi-tls  # Name of the Kubernetes Secret to be created by cert-manager
 ---
 # https://hub.docker.com/r/apache/nifi
 apiVersion: apps/v1
@@ -76,10 +80,47 @@ spec:
           - containerPort: 31024
             name: udp-port4
           env:
+          - name: NIFI_WEB_HTTPS_HOST
+            value: home.lab.lan
+          - name: NIFI_SECURITY_KEYSTORE_TYPE
+            value: PKCS12
+          - name: NIFI_SECURITY_KEYSTORE
+            #value: /opt/nifi/nifi-current/conf/keystore.p12  # Path to keystore inside the container
+            value: /opt/nifi/nifi-current/cert/keystore.p12  # Path to keystore inside the container
+          - name: NIFI_SECURITY_KEYSTORE_PASSWD
+            valueFrom:
+              secretKeyRef:
+                name: nifi-tls # Name of the Kubernetes Secret created by cert-manager
+                key: tls.key
+          - name: NIFI_SECURITY_TRUSTSTORE_TYPE
+            value: JKS
+          - name: NIFI_SECURITY_TRUSTSTORE
+            #value: /opt/nifi/nifi-current/conf/truststore.jks  # Path to truststore inside the container
+            value: /opt/nifi/nifi-current/cert/truststore.jks  # Path to truststore inside the container
+          - name: NIFI_SECURITY_TRUSTSTORE_PASSWD
+            valueFrom:
+              secretKeyRef:
+                name: nifi-tls # Name of the Kubernetes Secret created by cert-manager
+                key: tls.crt # Typically uses the cert as password, but could be different
+          - name: NIFI_SECURITY_NEED_CLIENT_AUTH
+            value: 'false' # Change to 'true' if you want client certificate authentication
           {{- range $object.env }}
           - name: {{ .name | quote }}
             value: {{ .value | quote }}
           {{- end }}
+          volumeMounts:
+            - name: nifi-keystore-volume
+              #mountPath: /opt/nifi/nifi-current/conf
+              mountPath: /opt/nifi/nifi-current/cert
+      volumes:
+        - name: nifi-keystore-volume
+          secret:
+            secretName: nifi-tls  # Name of the Kubernetes Secret created by cert-manager
+            items:
+              - key: tls.crt
+                path: keystore.crt  # Renames the cert file (optional)
+              - key: tls.key
+                path: keystore.key  # Renames the key file (optional)
           # volumeMounts:
           # - name: nifi-logs-pv
           #   mountPath: /opt/nifi/nifi-current/logs

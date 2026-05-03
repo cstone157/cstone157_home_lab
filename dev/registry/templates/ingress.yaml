@@ -1,10 +1,13 @@
+{{/*
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
+  name: {{ .Chart.Name }}-ing
+  namespace: {{ .Chart.Name }}
   labels:
-    app: image-repository
-  name: image-repository
-  namespace: lab-test
+    app: {{ .Chart.Name }}
+    date: {{ now | htmlDate }}
+    version: {{ .Chart.Version | quote }}
 spec:
   rules:
   - host: registry.tmdash2.lab.shocn.lan
@@ -12,7 +15,7 @@ spec:
       paths:
       - backend:
           service:
-            name: image-repository
+            name: {{ .Chart.Name }}
             port:
               number: 5000
         path: /
@@ -20,4 +23,5 @@ spec:
   tls:
   - hosts:
     - registry.tmdash2.lab.shocn.lan
-    secretName: image-repository-tls-ingress
+    secretName: {{ .Chart.Name }}-tls-ingress
+*/}}

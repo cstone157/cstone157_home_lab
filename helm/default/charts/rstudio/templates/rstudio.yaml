@@ -1,8 +1,12 @@
 {{- $object := .Values -}}
+{{- if not $object.version -}}
+    {{- $_ := set $object "version" .Values.global.version -}}
+{{- end }}
+{{- if not $object.namespace -}}
+    {{- $_ := set $object "namespace" .Values.global.namespace -}}
+{{- end }}
+
 {{- if $object.enabled }}
-
-
-
 apiVersion: apps/v1
 kind: StatefulSet
 {{- template "mychart.metadata" $object }}

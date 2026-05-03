@@ -1,0 +1,18 @@
+{{/*
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ .Chart.Name }}-pvc # Consistent name for the claim
+  namespace: {{ .Chart.Name }}
+  labels:
+    app: {{ .Chart.Name }}
+    date: {{ now | htmlDate }}
+    version: {{ .Chart.Version | quote }}
+spec:
+  accessModes:
+    - ReadWriteOnce # Or ReadWriteMany if your storage supports it
+  resources:
+    requests:
+      storage: 10Gi #  Adjust the storage size as needed
+  # storageClassName: standard # Or your preferred storage class
+*/}}
