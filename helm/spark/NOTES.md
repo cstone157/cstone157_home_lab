@@ -17,3 +17,4 @@
 
 #### Delete the application
 - $ kubectl delete sparkapp spark-pi
+

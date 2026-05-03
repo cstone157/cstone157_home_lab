@@ -21,6 +21,10 @@ spec:
         - name: {{ $object.name }}
           image: {{ $object.image }}
           imagePullPolicy: {{ $object.imagePullPolicy }}
+          resources:
+            requests:
+              cpu: 4m
+              memory: 16Gi
           ports:
           {{- range .service }}
           - containerPort: {{ .port }}
