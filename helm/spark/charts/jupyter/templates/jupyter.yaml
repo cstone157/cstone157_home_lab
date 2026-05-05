@@ -1,0 +1,24 @@
+{{- $object := .Values -}}
+{{- if $object.enabled }}
+
+{{/* Retrieve the values and if there is no version or namepsace, then use the global values */}}
+{{- if not $object.version -}}
+    {{- $_ := set $object "version" .Values.global.version -}}
+{{- end }}
+{{- if not $object.namespace -}}
+    {{- $_ := set $object "namespace" .Values.global.namespace -}}
+{{- end }}
+
+{{/* Add Service if they are required */}} 
+{{- template "mychart.service" $object }}
+
+{{/* Add Statefulset if they are required */}}
+{{- template "mychart.statefulset" $object }}
+
+{{/* Add PersistentVolumeClaims if they are required */}}
+{{- template "mychart.persistent_volume_claim" $object }}
+
+{{/* Add PersistentVolumes if they are required */}}
+{{- template "mychart.persistent_volume" $object }}
+
+{{- end }}

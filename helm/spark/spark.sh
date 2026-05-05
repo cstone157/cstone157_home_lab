@@ -1,36 +1,19 @@
 #!/bin/bash
 
-## ========================================
-## Build the Spark Runner Docker image
-## ========================================
-nerdctl build -t spark-runner:latest -f spark-runner/Dockerfile -namespace=k8s.io ./spark-runner/
+# # Create namespace and service account
+# kubectl create namespace spark
+# kubectl create serviceaccount spark -n spark
 
-## ========================================
-## Apply the RBAC configuration for Spark
-## ========================================
-kubectl apply -f spark-rbac.yaml
+# # Grant permissions (RBAC)
+# kubectl create clusterrolebinding spark-role --clusterrole=edit --serviceaccount=spark:spark --namespace=spark
 
-sleep 5
-
-## ========================================
-## Deploy JupyterLab
-## ========================================
-kubectl apply -f jupyter-deployment.yaml
-
-## ========================================
-## Get the token for JupyterLab access
-## ========================================
-kubectl logs deployment/jupyterlab | grep "token="
-
-## ========================================
-## Enable port forwarding to access JupyterLab
-## ========================================
-kubectl port-forward svc/jupyterlab-service 8888:8888
-
-## ========================================
-## To uninstall the Spark Operator and the 
-## JupyterLab deployment, you can use the 
-## following commands:
-## ========================================
-# kubectl delete -f jupyter-deployment.yaml
-# kubectl delete -f spark-rbac.yaml
+# bin/spark-submit \
+#     --master k8s://https://<K8S_API_SERVER_URL> \
+#     --deploy-mode cluster \
+#     --name spark-pi \
+#     --class org.apache.spark.examples.SparkPi \
+#     --conf spark.executor.instances=3 \
+#     --conf spark.kubernetes.container.image=apache/spark:latest \
+#     --conf spark.kubernetes.authenticate.driver.serviceAccountName=spark \
+#     --conf spark.kubernetes.namespace=spark \
+#     local:///opt/spark/examples/jars/spark-examples_2.12-3.5.0.jar
