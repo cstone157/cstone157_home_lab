@@ -3,7 +3,27 @@
 # Create Namespace
 kubectl create namespace spark-jupyter || true
 
-# 1. Create ServiceAccount and RBAC
+# 1. Create a Pod Template ConfigMap
+# This template defines the executor pod structure without resource requests.
+cat <<EOF | kubectl apply -f -
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: spark-pod-template
+  namespace: spark-jupyter
+data:
+  executor-template.yaml: |
+    apiVersion: v1
+    kind: Pod
+    spec:
+      containers:
+      - name: spark-kubernetes-executor # Spark looks for this specific name
+        resources:
+          requests: null  # Explicitly nullify requests
+          limits: null    # Explicitly nullify limits
+EOF
+
+# 2. Create ServiceAccount and RBAC
 cat <<EOF | kubectl apply -f -
 apiVersion: v1
 kind: ServiceAccount
@@ -36,8 +56,7 @@ roleRef:
   apiGroup: rbac.authorization.k8s.io
 EOF
 
-# 2. Create Headless Service for the Spark Driver
-# This remains Headless (ClusterIP: None) so executors can find the driver pod via DNS.
+# 3. Create Headless Service for Spark Driver
 cat <<EOF | kubectl apply -f -
 apiVersion: v1
 kind: Service
@@ -55,7 +74,7 @@ spec:
       port: 7078
 EOF
 
-# 3. Deploy JupyterLab
+# 4. Deploy JupyterLab with Template Mounted
 cat <<EOF | kubectl apply -f -
 apiVersion: apps/v1
 kind: Deployment
@@ -85,6 +104,13 @@ spec:
           value: "yes"
         - name: JUPYTER_TOKEN
           value: "spark-k8s-pass"
+        volumeMounts:
+        - name: spark-template-volume
+          mountPath: /opt/spark/templates
+      volumes:
+      - name: spark-template-volume
+        configMap:
+          name: spark-pod-template
 ---
 apiVersion: v1
 kind: Service
@@ -92,16 +118,13 @@ metadata:
   name: jupyterlab-ui
   namespace: spark-jupyter
 spec:
-  type: NodePort # Changed from LoadBalancer
+  type: NodePort
   ports:
     - port: 8888
       targetPort: 8888
-      nodePort: 30088 # You can access Jupyter at <NodeIP>:30088
+      nodePort: 30088
   selector:
     app: jupyterlab
 EOF
 
-echo "Deployment complete."
-echo "Access JupyterLab at http://<ANY_NODE_IP>:30088"
-echo "Token: spark-k8s-pass"
-echo ""
+echo "Deployment complete. NodePort: 30088"
