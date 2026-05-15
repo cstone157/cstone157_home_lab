@@ -1,10 +1,15 @@
 #!/bin/bash
 
-# Create Namespace
+# 1. Create Namespace
 kubectl create namespace spark-jupyter || true
 
-# 1. Create a Pod Template ConfigMap
-# This template defines the executor pod structure without resource requests.
+# 2. IMPORTANT: Remove any default LimitRanges that force resource requests
+# In many clusters (like OpenShift or managed K8s), namespaces come with 
+# default requests. This command ensures the namespace allows "BestEffort" pods.
+kubectl delete limitrange --all -n spark-jupyter || true
+
+# 3. Create a Pod Template ConfigMap
+# We define the container but leave the resources block completely empty.
 cat <<EOF | kubectl apply -f -
 apiVersion: v1
 kind: ConfigMap
@@ -17,13 +22,11 @@ data:
     kind: Pod
     spec:
       containers:
-      - name: spark-kubernetes-executor # Spark looks for this specific name
-        resources:
-          requests: null  # Explicitly nullify requests
-          limits: null    # Explicitly nullify limits
+      - name: spark-kubernetes-executor
+        resources: {} # Explicitly empty object
 EOF
 
-# 2. Create ServiceAccount and RBAC
+# 4. Create ServiceAccount and RBAC
 cat <<EOF | kubectl apply -f -
 apiVersion: v1
 kind: ServiceAccount
@@ -56,7 +59,7 @@ roleRef:
   apiGroup: rbac.authorization.k8s.io
 EOF
 
-# 3. Create Headless Service for Spark Driver
+# 5. Create Headless Service for Spark Driver
 cat <<EOF | kubectl apply -f -
 apiVersion: v1
 kind: Service
@@ -74,7 +77,7 @@ spec:
       port: 7078
 EOF
 
-# 4. Deploy JupyterLab with Template Mounted
+# 6. Deploy JupyterLab
 cat <<EOF | kubectl apply -f -
 apiVersion: apps/v1
 kind: Deployment
@@ -127,4 +130,4 @@ spec:
     app: jupyterlab
 EOF
 
-echo "Deployment complete. NodePort: 30088"
+echo "Deployment complete. Access at http://<NODE_IP>:30088"
