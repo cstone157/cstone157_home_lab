@@ -7,7 +7,7 @@ kubectl create namespace spark-jupyter || true
 kubectl delete limitrange --all -n spark-jupyter || true
 
 # 3. Create a Pod Template ConfigMap
-# We explicitly set the command to the Spark Executor backend.
+# UPDATED: Path changed to /usr/local/spark/bin/spark-class
 cat <<EOF | kubectl apply -f -
 apiVersion: v1
 kind: ConfigMap
@@ -22,15 +22,15 @@ data:
       containers:
       - name: spark-kubernetes-executor
         image: quay.io/jupyter/all-spark-notebook:latest
-        # Override the entrypoint to call Spark directly
-        command: ["/opt/spark/bin/spark-class"]
+        # Override the entrypoint to call Spark directly at the correct path
+        command: ["/usr/local/spark/bin/spark-class"]
         args: ["org.apache.spark.executor.CoarseGrainedExecutorBackend"]
         resources:
           requests: null
           limits: null
         env:
         - name: SPARK_HOME
-          value: /opt/spark
+          value: /usr/local/spark
 EOF
 
 # 4. Create ServiceAccount and RBAC

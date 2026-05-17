@@ -1,4 +1,4 @@
-from pyspark.sql import SparkSession
+# from pyspark.sql import SparkSession
 
 # spark = SparkSession.builder \
 #     .appName("Spark-Best-Effort") \
@@ -40,8 +40,33 @@ from pyspark.sql import SparkSession
 #     .config("spark.memory.overheadFactor", "0.01") \
 #     .getOrCreate()
 
+# # Test execution
+# print("Calculating sum...")
+# print(spark.range(1000).sum())
+
+from pyspark.sql import SparkSession
+
+# spark = SparkSession.builder \
+#     .appName("Spark-K8s-Final-Fix") \
+#     .master("k8s://https://kubernetes.default.svc.cluster.local:443") \
+#     .config("spark.kubernetes.container.image", "quay.io/jupyter/all-spark-notebook:latest") \
+#     .config("spark.kubernetes.namespace", "spark-jupyter") \
+#     .config("spark.kubernetes.authenticate.driver.serviceAccountName", "jupyter-serviceaccount") \
+#     .config("spark.executor.instances", "1") \
+#     .config("spark.driver.host", "jupyter-driver-svc.spark-jupyter.svc.cluster.local") \
+#     .config("spark.driver.port", "7077") \
+#     .config("spark.driver.bindAddress", "0.0.0.0") \
+#     .config("spark.blockManager.port", "7078") \
+#     # Link to the template with the corrected path
+#     .config("spark.kubernetes.executor.podTemplateFile", "/opt/spark/templates/executor-template.yaml") \
+#     # Force requests to be negligible (satisfies Spark/K8s logic while remaining BestEffort)
+#     .config("spark.kubernetes.executor.request.cores", "1m") \
+#     .config("spark.executor.memory", "512m") \
+#     .config("spark.memory.overheadFactor", "0.01") \
+#     .getOrCreate()
+
 spark = SparkSession.builder \
-    .appName("Spark-Best-Effort-Fixed") \
+    .appName("Spark-K8s-Final-Fix") \
     .master("k8s://https://kubernetes.default.svc.cluster.local:443") \
     .config("spark.kubernetes.container.image", "quay.io/jupyter/all-spark-notebook:latest") \
     .config("spark.kubernetes.namespace", "spark-jupyter") \
@@ -57,6 +82,8 @@ spark = SparkSession.builder \
     .config("spark.memory.overheadFactor", "0.01") \
     .getOrCreate()
 
-# Test execution
-print("Calculating sum...")
-print(spark.range(1000).sum())
+
+# Verify execution
+data = [("Project", "Jupyter"), ("Spark", "K8s"), ("Status", "Running")]
+df = spark.createDataFrame(data, ["Key", "Value"])
+df.show()
