@@ -21,8 +21,27 @@ from pyspark.sql import SparkSession
 #     .config("spark.memory.overheadFactor", "0.01") \
 #     .getOrCreate()
 
+# spark = SparkSession.builder \
+#     .appName("Spark-Best-Effort-Fixed") \
+#     .master("k8s://https://kubernetes.default.svc.cluster.local:443") \
+#     .config("spark.kubernetes.container.image", "quay.io/jupyter/all-spark-notebook:latest") \
+#     .config("spark.kubernetes.namespace", "spark-jupyter") \
+#     .config("spark.kubernetes.authenticate.driver.serviceAccountName", "jupyter-serviceaccount") \
+#     .config("spark.executor.instances", "1") \
+#     .config("spark.driver.host", "jupyter-driver-svc.spark-jupyter.svc.cluster.local") \
+#     .config("spark.driver.port", "7077") \
+#     .config("spark.driver.bindAddress", "0.0.0.0") \
+#     .config("spark.blockManager.port", "7078") \
+#     # Point to the template with the fixed command
+#     .config("spark.kubernetes.executor.podTemplateFile", "/opt/spark/templates/executor-template.yaml") \
+#     # Force requests to near-zero
+#     .config("spark.kubernetes.executor.request.cores", "1m") \
+#     .config("spark.executor.memory", "512m") \
+#     .config("spark.memory.overheadFactor", "0.01") \
+#     .getOrCreate()
+
 spark = SparkSession.builder \
-    .appName("Spark-Best-Effort") \
+    .appName("Spark-Best-Effort-Fixed") \
     .master("k8s://https://kubernetes.default.svc.cluster.local:443") \
     .config("spark.kubernetes.container.image", "quay.io/jupyter/all-spark-notebook:latest") \
     .config("spark.kubernetes.namespace", "spark-jupyter") \
@@ -38,6 +57,6 @@ spark = SparkSession.builder \
     .config("spark.memory.overheadFactor", "0.01") \
     .getOrCreate()
 
-# Check the results
-df = spark.range(1, 10).toDF("number")
-df.show()
+# Test execution
+print("Calculating sum...")
+print(spark.range(1000).sum())

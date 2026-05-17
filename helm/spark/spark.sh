@@ -3,13 +3,11 @@
 # 1. Create Namespace
 kubectl create namespace spark-jupyter || true
 
-# 2. IMPORTANT: Remove any default LimitRanges that force resource requests
-# In many clusters (like OpenShift or managed K8s), namespaces come with 
-# default requests. This command ensures the namespace allows "BestEffort" pods.
+# 2. Remove any default LimitRanges (Ensures BestEffort is allowed)
 kubectl delete limitrange --all -n spark-jupyter || true
 
 # 3. Create a Pod Template ConfigMap
-# We define the container but leave the resources block completely empty.
+# We explicitly set the command to the Spark Executor backend.
 cat <<EOF | kubectl apply -f -
 apiVersion: v1
 kind: ConfigMap
@@ -23,7 +21,16 @@ data:
     spec:
       containers:
       - name: spark-kubernetes-executor
-        resources: {} # Explicitly empty object
+        image: quay.io/jupyter/all-spark-notebook:latest
+        # Override the entrypoint to call Spark directly
+        command: ["/opt/spark/bin/spark-class"]
+        args: ["org.apache.spark.executor.CoarseGrainedExecutorBackend"]
+        resources:
+          requests: null
+          limits: null
+        env:
+        - name: SPARK_HOME
+          value: /opt/spark
 EOF
 
 # 4. Create ServiceAccount and RBAC
