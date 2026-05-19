@@ -3,12 +3,11 @@
 # 1. Create Namespace
 kubectl create namespace spark-jupyter || true
 
-# 2. Remove any default LimitRanges (Ensures BestEffort is allowed)
+# 2. Remove any default LimitRanges
 kubectl delete limitrange --all -n spark-jupyter || true
 
 # 3. Create a Pod Template ConfigMap
-# The shell wrapper trick: Spark passes "executor --driver-url..."
-# /bin/bash -c treats "executor" as $0 and "$@" as "--driver-url..."
+# We use the official entrypoint.sh which knows how to handle Spark arguments properly.
 cat <<EOF | kubectl apply -f -
 apiVersion: v1
 kind: ConfigMap
@@ -23,8 +22,13 @@ data:
       containers:
       - name: spark-kubernetes-executor
         image: quay.io/jupyter/all-spark-notebook:latest
-        command: ["/bin/bash", "-c", "exec /usr/local/spark/bin/spark-class org.apache.spark.executor.CoarseGrainedExecutorBackend \"\$@\""]
-        resources: {} # Empty object to help ensure BestEffort QoS
+        # The official Spark entrypoint script is the most robust way to launch
+        command: ["/usr/local/spark/kubernetes/dockerfiles/spark/entrypoint.sh"]
+        # We provide 'executor' as the first arg; Spark will append the rest
+        args: ["executor"]
+        resources:
+          requests: null
+          limits: null
         env:
         - name: SPARK_HOME
           value: /usr/local/spark
@@ -133,5 +137,3 @@ spec:
   selector:
     app: jupyterlab
 EOF
-
-echo "Deployment complete. Access at http://<NODE_IP>:30088"

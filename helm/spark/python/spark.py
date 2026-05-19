@@ -1,7 +1,7 @@
 from pyspark.sql import SparkSession
 
 spark = SparkSession.builder \
-    .appName("Spark-K8s-Success") \
+    .appName("Spark-K8s-Entrypoint-Fix") \
     .master("k8s://https://kubernetes.default.svc.cluster.local:443") \
     .config("spark.kubernetes.container.image", "quay.io/jupyter/all-spark-notebook:latest") \
     .config("spark.kubernetes.namespace", "spark-jupyter") \
@@ -17,6 +17,6 @@ spark = SparkSession.builder \
     .config("spark.memory.overheadFactor", "0.01") \
     .getOrCreate()
 
-# Verify the fix
-print("Testing Spark connection...")
-print(spark.range(1, 1000).sum())
+# Test the connection
+print("Spark Session successfully initialized.")
+print(spark.range(10).collect())
