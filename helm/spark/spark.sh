@@ -7,7 +7,8 @@ kubectl create namespace spark-jupyter || true
 kubectl delete limitrange --all -n spark-jupyter || true
 
 # 3. Create a Pod Template ConfigMap
-# UPDATED: Path changed to /usr/local/spark/bin/spark-class
+# The shell wrapper trick: Spark passes "executor --driver-url..."
+# /bin/bash -c treats "executor" as $0 and "$@" as "--driver-url..."
 cat <<EOF | kubectl apply -f -
 apiVersion: v1
 kind: ConfigMap
@@ -22,12 +23,8 @@ data:
       containers:
       - name: spark-kubernetes-executor
         image: quay.io/jupyter/all-spark-notebook:latest
-        # Override the entrypoint to call Spark directly at the correct path
-        command: ["/usr/local/spark/bin/spark-class"]
-        args: ["org.apache.spark.executor.CoarseGrainedExecutorBackend"]
-        resources:
-          requests: null
-          limits: null
+        command: ["/bin/bash", "-c", "exec /usr/local/spark/bin/spark-class org.apache.spark.executor.CoarseGrainedExecutorBackend \"\$@\""]
+        resources: {} # Empty object to help ensure BestEffort QoS
         env:
         - name: SPARK_HOME
           value: /usr/local/spark
