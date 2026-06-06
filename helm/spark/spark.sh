@@ -1,38 +1,38 @@
 #!/bin/bash
 
 # 1. Create Namespace
-kubectl create namespace spark-jupyter || true
+# kubectl create namespace spark-jupyter || true
 
 # 2. Remove any default LimitRanges
 kubectl delete limitrange --all -n spark-jupyter || true
 
-# 3. Create a Pod Template ConfigMap
-# We use the official entrypoint.sh which knows how to handle Spark arguments properly.
-cat <<EOF | kubectl apply -f -
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: spark-pod-template
-  namespace: spark-jupyter
-data:
-  executor-template.yaml: |
-    apiVersion: v1
-    kind: Pod
-    spec:
-      containers:
-      - name: spark-kubernetes-executor
-        image: quay.io/jupyter/all-spark-notebook:latest
-        # The official Spark entrypoint script is the most robust way to launch
-        command: ["/usr/local/spark/kubernetes/dockerfiles/spark/entrypoint.sh"]
-        # We provide 'executor' as the first arg; Spark will append the rest
-        args: ["executor"]
-        resources:
-          requests: null
-          limits: null
-        env:
-        - name: SPARK_HOME
-          value: /usr/local/spark
-EOF
+# # 3. Create a Pod Template ConfigMap
+# # We use the official entrypoint.sh which knows how to handle Spark arguments properly.
+# cat <<EOF | kubectl apply -f -
+# apiVersion: v1
+# kind: ConfigMap
+# metadata:
+#   name: spark-pod-template
+#   namespace: spark-jupyter
+# data:
+#   executor-template.yaml: |
+#     apiVersion: v1
+#     kind: Pod
+#     spec:
+#       containers:
+#       - name: spark-kubernetes-executor
+#         image: quay.io/jupyter/all-spark-notebook:latest
+#         # The official Spark entrypoint script is the most robust way to launch
+#         command: ["/usr/local/spark/kubernetes/dockerfiles/spark/entrypoint.sh"]
+#         # We provide 'executor' as the first arg; Spark will append the rest
+#         args: ["executor"]
+#         resources:
+#           requests: null
+#           limits: null
+#         env:
+#         - name: SPARK_HOME
+#           value: /usr/local/spark
+# EOF
 
 # 4. Create ServiceAccount and RBAC
 cat <<EOF | kubectl apply -f -

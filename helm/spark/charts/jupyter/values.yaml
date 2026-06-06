@@ -1,7 +1,7 @@
 # ------------------------------------------------------------------------------
 # JupyterLab :
 # ------------------------------------------------------------------------------
-enabled: true
+enabled: false
 name: jupyter
 image: jupyter/minimal-notebook:notebook-7.0.6
 imagePullPolicy: IfNotPresent
