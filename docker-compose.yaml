@@ -1,0 +1,51 @@
+version: '3.8'
+
+services:
+  ollama:
+    image: ollama/ollama:latest
+    container_name: ollama
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama_data:/root/.ollama
+    # Uncomment the following section if you have an NVIDIA GPU
+    # deploy:
+    #   resources:
+    #     reservations:
+    #       devices:
+    #         - driver: nvidia
+    #           count: 1
+    #           capabilities: [gpu]
+    networks:
+      - ai-network
+
+  flowise:
+    image: flowiseai/flowise:latest
+    container_name: flowise
+    restart: always
+    ports:
+      - "3000:3000"
+    environment:
+      - PORT=3000
+      - DATABASE_PATH=/root/.flowise
+      - APIKEY_PATH=/root/.flowise
+      - SECRETKEY_PATH=/root/.flowise
+      - LOG_PATH=/root/.flowise/logs
+      - BLOB_STORAGE_PATH=/root/.flowise/storage
+      # Optional: Add basic auth
+      # - FLOWISE_USERNAME=admin
+      # - FLOWISE_PASSWORD=password123
+    volumes:
+      - flowise_data:/root/.flowise
+    depends_on:
+      - ollama
+    networks:
+      - ai-network
+
+networks:
+  ai-network:
+    driver: bridge
+
+volumes:
+  ollama_data:
+  flowise_data:
