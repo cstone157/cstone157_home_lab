@@ -4,6 +4,7 @@ services:
   ollama:
     image: ollama/ollama:latest
     container_name: ollama
+    restart: always
     ports:
       - "11434:11434"
     volumes:
@@ -19,6 +20,18 @@ services:
     networks:
       - ai-network
 
+  # Initialization service to pull the model
+  ollama-init:
+    image: ollama/ollama:latest
+    container_name: ollama-init
+    depends_on:
+      - ollama
+    networks:
+      - ai-network
+    entrypoint: /bin/sh
+    command: >
+      -c "sleep 5; echo 'Pulling nemotron-3-ultra...'; ollama pull nemotron-3-ultra; echo 'Model pulled successfully!'"
+
   flowise:
     image: flowiseai/flowise:latest
     container_name: flowise
@@ -32,9 +45,6 @@ services:
       - SECRETKEY_PATH=/root/.flowise
       - LOG_PATH=/root/.flowise/logs
       - BLOB_STORAGE_PATH=/root/.flowise/storage
-      # Optional: Add basic auth
-      # - FLOWISE_USERNAME=admin
-      # - FLOWISE_PASSWORD=password123
     volumes:
       - flowise_data:/root/.flowise
     depends_on:
